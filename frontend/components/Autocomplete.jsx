@@ -36,7 +36,7 @@ module.exports = React.createClass({
       }.bind(this));
     }
     return (
-      <div className='search' onMouseLeave={this.clearList}>
+      <div className='search' onMouseLeave={this.clearList} onMouseEnter={this.update}>
         <input onChange={this.update} value={this.state.query} placeholder="Search by city or ZIP"></input>
         <ul className='results'>
           {list}
