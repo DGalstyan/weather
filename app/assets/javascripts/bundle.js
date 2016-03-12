@@ -19990,13 +19990,13 @@
 	
 	module.exports = {
 	  fetchWeather: function (apiQuery) {
-	    $.get('http://localhost:3000/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly/q/' + apiQuery, function (weather) {
+	    $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly/q/' + apiQuery, function (weather) {
 	      WeatherActions.updateWeather(weather);
 	      console.log(weather);
 	    });
 	  },
 	  fetchWeatherAutocomplete: function (acQuery, cb) {
-	    $.get('http://localhost:3000/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly' + acQuery, function (weather) {
+	    $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly' + acQuery, function (weather) {
 	      WeatherActions.updateWeather(weather);
 	      cb && cb(weather.location);
 	    });
@@ -26829,7 +26829,7 @@
 	var LocationActions = __webpack_require__(188);
 	module.exports = {
 	  fetchLocations: function (cb) {
-	    $.get('http://localhost:3000/api/locations', function (locations) {
+	    $.get('/api/locations', function (locations) {
 	      LocationActions.setLocations(locations);
 	      cb && cb(locations[0]);
 	    });
@@ -26837,7 +26837,7 @@
 	  addLocation: function (location) {
 	    $.ajax({
 	      type: "POST",
-	      url: "http://localhost:3000/api/locations",
+	      url: "/api/locations",
 	      dataType: "json",
 	      data: { location: location },
 	      success: function (location) {
@@ -26851,7 +26851,7 @@
 	  removeLocation: function (id) {
 	    $.ajax({
 	      type: "DELETE",
-	      url: "http://localhost:3000/api/locations/" + id,
+	      url: "/api/locations/" + id,
 	      success: function (location) {
 	        LocationActions.removeLocation(location);
 	      },
@@ -26863,7 +26863,7 @@
 	  searchLocation: function (query, cb) {
 	    $.ajax({
 	      type: "GET",
-	      url: "http://localhost:3000/api/search?api_query=" + query,
+	      url: "/api/search?api_query=" + query,
 	      dataType: "json",
 	      success: function (results) {
 	        cb(results);

@@ -1,7 +1,7 @@
 var LocationActions = require('../actions/locations');
 module.exports = {
   fetchLocations: function (cb) {
-    $.get('http://localhost:3000/api/locations', function (locations) {
+    $.get('/api/locations', function (locations) {
       LocationActions.setLocations(locations);
       cb && cb(locations[0]);
     });
@@ -9,7 +9,7 @@ module.exports = {
   addLocation: function (location) {
     $.ajax({
       type: "POST",
-      url: "http://localhost:3000/api/locations",
+      url: "/api/locations",
       dataType: "json",
       data: { location: location },
       success: function (location) {
@@ -23,7 +23,7 @@ module.exports = {
   removeLocation: function (id) {
     $.ajax({
       type: "DELETE",
-      url: "http://localhost:3000/api/locations/" + id,
+      url: "/api/locations/" + id,
       success: function (location) {
         LocationActions.removeLocation(location);
       },
@@ -35,7 +35,7 @@ module.exports = {
   searchLocation: function (query, cb) {
     $.ajax({
       type: "GET",
-      url: "http://localhost:3000/api/search?api_query=" + query,
+      url: "/api/search?api_query=" + query,
       dataType: "json",
       success: function (results) {
         cb(results);
