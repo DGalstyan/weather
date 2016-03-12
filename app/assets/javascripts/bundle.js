@@ -26952,7 +26952,7 @@
 	    }
 	    return React.createElement(
 	      'div',
-	      { className: 'search', onMouseOut: this.clearList },
+	      { className: 'search', onMouseLeave: this.clearList },
 	      React.createElement('input', { onChange: this.update, value: this.state.query, placeholder: 'Search by city or ZIP' }),
 	      React.createElement(
 	        'ul',
