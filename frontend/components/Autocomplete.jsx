@@ -10,9 +10,11 @@ module.exports = React.createClass({
   update: function (e) {
     var query = e.target.value;
     this.setState({ query: query });
-    LocationApi.searchLocation(query, function (results) {
-      this.setState({ results: results });
-    }.bind(this));
+    if (query != "") {
+      LocationApi.searchLocation(query, function (results) {
+        this.setState({ results: results });
+      }.bind(this));
+    }
   },
   changeLocation: function (result) {
     return function () {
