@@ -19771,6 +19771,7 @@
 	    SunUtil = __webpack_require__(193);
 	
 	// Extracts data from the JSON objects received from API and builds the HTML to display it.
+	// SunUtil provides a method to extact sun phase data from the API object and make it ready to display.
 	
 	module.exports = React.createClass({
 	  displayName: 'exports',
@@ -27057,6 +27058,8 @@
 /* 192 */
 /***/ function(module, exports) {
 
+	// Builds an object out of API location data that can be read by the LocationsStore
+	
 	module.exports = {
 	  convertLocation: function (location) {
 	    var city = location.city;
@@ -27069,6 +27072,9 @@
 /* 193 */
 /***/ function(module, exports) {
 
+	// Builds an object with sunrise/sunset data extracted from API data.
+	// Takes extra precautions just in case sunset is in the AM and sunrise is PM.
+	
 	module.exports = {
 	  parseSunPhase: function (sunPhase) {
 	    var ampm, sunrise, sunset, hour;

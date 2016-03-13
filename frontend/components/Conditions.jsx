@@ -2,6 +2,7 @@ var React = require('react'),
     SunUtil = require('../utils/SunUtil');
 
 // Extracts data from the JSON objects received from API and builds the HTML to display it.
+// SunUtil provides a method to extact sun phase data from the API object and make it ready to display.
 
 module.exports = React.createClass({
   render: function () {

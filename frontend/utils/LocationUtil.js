@@ -1,3 +1,5 @@
+// Builds an object out of API location data that can be read by the LocationsStore
+
 module.exports = {
   convertLocation: function (location) {
     var city = location.city;

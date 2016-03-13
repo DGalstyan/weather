@@ -1,3 +1,6 @@
+// Builds an object with sunrise/sunset data extracted from API data.
+// Takes extra precautions just in case sunset is in the AM and sunrise is PM.
+
 module.exports = {
   parseSunPhase: function (sunPhase) {
     var ampm, sunrise, sunset, hour;
