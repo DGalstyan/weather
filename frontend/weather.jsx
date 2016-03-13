@@ -6,6 +6,9 @@ var React = require('react'),
     WeatherStore = require('./stores/weather'),
     LocationsStore = require('./stores/locations');
 
+// Main app rendered by ReactDOM, stores current location in state and passes to child
+// components as a property along with a function to modify the state.
+
 var WeatherApp = React.createClass({
   getInitialState: function () {
     return { location: { name: "New York, NY"} };
@@ -31,21 +34,3 @@ document.addEventListener('DOMContentLoaded', function () {
   var root = document.getElementById('root');
   ReactDOM.render(<WeatherApp />, root);
 });
-
-
-
-
-
-
-
-//For readme
-// uses HTTParty gem to fetch weather server side
-
-// Optimizations
-// Store weather in cache and only refetch after x minutes.  Save API calls
-
-
-// Users are created and authenticated passively using cookies, new users are
-// given the five default cities as associated locations.  Locations are added
-// and removed by ajax requests to the server, with success callbacks that update
-// the local store.

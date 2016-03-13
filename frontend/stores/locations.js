@@ -18,20 +18,23 @@ LocationsStore.findIndexOf = function (location) {
 }
 
 LocationsStore.__onDispatch = function (payload) {
-  if (payload.actionType === Constants.ADD_LOCATION) {
-    _locations.push(payload.location);
-    LocationsStore.__emitChange();
-  } else if (payload.actionType === Constants.REMOVE_LOCATION) {
-    var idx = LocationsStore.findIndexOf(payload.location);
-    if (idx >= 0) {
-      _locations.splice(idx, 1);
-    }
-    LocationsStore.__emitChange();
-  } else if (payload.actionType === Constants.SET_LOCATIONS) {
-    _locations = payload.locations
-    LocationsStore.__emitChange();
+  switch (payload.actionType) {
+    case Constants.ADD_LOCATION:
+      _locations.push(payload.location);
+      LocationsStore.__emitChange();
+      break;
+    case Constants.REMOVE_LOCATION:
+      var idx = LocationsStore.findIndexOf(payload.location);
+      if (idx >= 0) {
+        _locations.splice(idx, 1);
+      }
+      LocationsStore.__emitChange();
+      break;
+    case Constants.SET_LOCATIONS:
+      _locations = payload.locations;
+      LocationsStore.__emitChange();
+      break;
   }
 }
 
 module.exports = LocationsStore;
-window.LS = LocationsStore;

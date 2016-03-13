@@ -1,3 +1,5 @@
+// Builds a query string out of a location object that can be understood by API.
+
 module.exports = {
   parseLocation: function (location) {
     if (!location.name) { debugger; }

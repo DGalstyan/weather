@@ -1,4 +1,7 @@
 class Api::LocationsController < ApplicationController
+  # API LocationsController is responsible for sending the User's locations to the client,
+  # creating and destroying saved locations, and sending requests to the autocomplete API
+  # to be passed on to client as JSON.  Note: autocomplete API does not require a key.
   def index
     render json: current_user.locations
   end

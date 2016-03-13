@@ -14,4 +14,5 @@ WeatherStore.__onDispatch = function (payload) {
     WeatherStore.__emitChange();
   }
 }
+
 module.exports = WeatherStore;

@@ -1,6 +1,8 @@
 var React = require('react'),
     SunUtil = require('../utils/SunUtil');
 
+// Extracts data from the JSON objects received from API and builds the HTML to display it.
+
 module.exports = React.createClass({
   render: function () {
     var w = this.props.weather;

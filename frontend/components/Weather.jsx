@@ -7,6 +7,10 @@ var React = require('react'),
     Autocomplete = require('./Autocomplete'),
     QueryUtil = require('../apiUtils/QueryUtil');
 
+// Weather component stores the weather of the current location in state, and
+// listens for changes in the WeatherStore, updating state when change occurs.
+// QueryUtil is used to build a query string from the location that can be processed by the API
+
 module.exports = React.createClass({
   getInitialState: function () {
     return { weather: WeatherStore.get() };

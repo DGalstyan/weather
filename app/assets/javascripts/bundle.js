@@ -52,6 +52,9 @@
 	    WeatherStore = __webpack_require__(169),
 	    LocationsStore = __webpack_require__(186);
 	
+	// Main app rendered by ReactDOM, stores current location in state and passes to child
+	// components as a property along with a function to modify the state.
+	
 	var WeatherApp = React.createClass({
 	  displayName: 'WeatherApp',
 	
@@ -81,17 +84,6 @@
 	  var root = document.getElementById('root');
 	  ReactDOM.render(React.createElement(WeatherApp, null), root);
 	});
-	
-	//For readme
-	// uses HTTParty gem to fetch weather server side
-
-	// Optimizations
-	// Store weather in cache and only refetch after x minutes.  Save API calls
-
-	// Users are created and authenticated passively using cookies, new users are
-	// given the five default cities as associated locations.  Locations are added
-	// and removed by ajax requests to the server, with success callbacks that update
-	// the local store.
 
 /***/ },
 /* 1 */
@@ -19707,6 +19699,10 @@
 	    Autocomplete = __webpack_require__(189),
 	    QueryUtil = __webpack_require__(190);
 	
+	// Weather component stores the weather of the current location in state, and
+	// listens for changes in the WeatherStore, updating state when change occurs.
+	// QueryUtil is used to build a query string from the location that can be processed by the API
+	
 	module.exports = React.createClass({
 	  displayName: 'exports',
 	
@@ -19773,6 +19769,8 @@
 
 	var React = __webpack_require__(1),
 	    SunUtil = __webpack_require__(193);
+	
+	// Extracts data from the JSON objects received from API and builds the HTML to display it.
 	
 	module.exports = React.createClass({
 	  displayName: 'exports',
@@ -19988,11 +19986,12 @@
 
 	var WeatherActions = __webpack_require__(163);
 	
+	// Fetches weather report from Wunderground API via the rails server (to keep API key hidden).
+	
 	module.exports = {
 	  fetchWeather: function (apiQuery) {
 	    $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly/q/' + apiQuery, function (weather) {
 	      WeatherActions.updateWeather(weather);
-	      console.log(weather);
 	    });
 	  },
 	  fetchWeatherAutocomplete: function (acQuery, cb) {
@@ -20366,6 +20365,7 @@
 	    WeatherStore.__emitChange();
 	  }
 	};
+	
 	module.exports = WeatherStore;
 
 /***/ },
@@ -26726,6 +26726,11 @@
 	    LocationUtil = __webpack_require__(192),
 	    LocationApi = __webpack_require__(187);
 	
+	// ToggleLocation is responsible for determining whether a location is saved to a
+	// User's list or not, and displaying the appropriate button to add/remove the location.
+	// LocationUtil is also used here to bridge the gap between location data from the API and
+	// location data saved in database (see Autocomplete).
+	
 	module.exports = React.createClass({
 	  displayName: 'exports',
 	
@@ -26804,34 +26809,41 @@
 	};
 	
 	LocationsStore.__onDispatch = function (payload) {
-	  if (payload.actionType === Constants.ADD_LOCATION) {
-	    _locations.push(payload.location);
-	    LocationsStore.__emitChange();
-	  } else if (payload.actionType === Constants.REMOVE_LOCATION) {
-	    var idx = LocationsStore.findIndexOf(payload.location);
-	    if (idx >= 0) {
-	      _locations.splice(idx, 1);
-	    }
-	    LocationsStore.__emitChange();
-	  } else if (payload.actionType === Constants.SET_LOCATIONS) {
-	    _locations = payload.locations;
-	    LocationsStore.__emitChange();
+	  switch (payload.actionType) {
+	    case Constants.ADD_LOCATION:
+	      _locations.push(payload.location);
+	      LocationsStore.__emitChange();
+	      break;
+	    case Constants.REMOVE_LOCATION:
+	      var idx = LocationsStore.findIndexOf(payload.location);
+	      if (idx >= 0) {
+	        _locations.splice(idx, 1);
+	      }
+	      LocationsStore.__emitChange();
+	      break;
+	    case Constants.SET_LOCATIONS:
+	      _locations = payload.locations;
+	      LocationsStore.__emitChange();
+	      break;
 	  }
 	};
 	
 	module.exports = LocationsStore;
-	window.LS = LocationsStore;
 
 /***/ },
 /* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var LocationActions = __webpack_require__(188);
+	
+	// This API is responsible for retrieving a User's locations, adding a location,
+	// removing a location, and sending requests to the autocomplete API.
+	
 	module.exports = {
 	  fetchLocations: function (cb) {
 	    $.get('/api/locations', function (locations) {
 	      LocationActions.setLocations(locations);
-	      cb && cb(locations[0]);
+	      cb && cb(locations[0]); // Used to automatically load the first saved location when page loads.
 	    });
 	  },
 	  addLocation: function (location) {
@@ -26912,6 +26924,11 @@
 	    LocationUtil = __webpack_require__(192),
 	    WeatherApi = __webpack_require__(162);
 	
+	// Autocomplete uses the Wunderground autocomplete API to list matching results
+	// as the search is being typed. LocationUtil is used to extract information about
+	// the location sent from the API into an object that can be used in determining
+	// whether the User has saved the current location or not.
+	
 	module.exports = React.createClass({
 	  displayName: 'exports',
 	
@@ -26969,6 +26986,8 @@
 /* 190 */
 /***/ function(module, exports) {
 
+	// Builds a query string out of a location object that can be understood by API.
+	
 	module.exports = {
 	  parseLocation: function (location) {
 	    if (!location.name) {
@@ -26988,6 +27007,9 @@
 	var React = __webpack_require__(1),
 	    LocationsStore = __webpack_require__(186),
 	    LocationApi = __webpack_require__(187);
+	
+	// LocationIndex is a side bar displaying User's saved locations.
+	// Each list item has an onClick handler that will update the state of the parent.
 	
 	module.exports = React.createClass({
 	  displayName: 'exports',
@@ -27079,6 +27101,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
+	
+	// Extracts data from the JSON objects received from API and builds the HTML to display it.
 	
 	module.exports = React.createClass({
 	  displayName: 'exports',

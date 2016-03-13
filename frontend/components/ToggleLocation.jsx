@@ -3,6 +3,11 @@ var React = require('react'),
     LocationUtil = require('../utils/LocationUtil'),
     LocationApi = require('../apiUtils/LocationApi');
 
+// ToggleLocation is responsible for determining whether a location is saved to a
+// User's list or not, and displaying the appropriate button to add/remove the location.
+// LocationUtil is also used here to bridge the gap between location data from the API and
+// location data saved in database (see Autocomplete). 
+
 module.exports = React.createClass({
   getInitialState: function () {
     var location = LocationUtil.convertLocation(this.props.location);

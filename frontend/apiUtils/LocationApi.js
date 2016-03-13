@@ -1,9 +1,13 @@
 var LocationActions = require('../actions/locations');
+
+// This API is responsible for retrieving a User's locations, adding a location,
+// removing a location, and sending requests to the autocomplete API.
+
 module.exports = {
   fetchLocations: function (cb) {
     $.get('/api/locations', function (locations) {
       LocationActions.setLocations(locations);
-      cb && cb(locations[0]);
+      cb && cb(locations[0]); // Used to automatically load the first saved location when page loads.
     });
   },
   addLocation: function (location) {

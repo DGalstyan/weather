@@ -5,6 +5,3 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-["New York, NY", "Chicago, IL", "Seattle, WA", "Houston, TX", "San Diego, CA"].each do |city|
-  User.last.locations.create(name: city)
-end

@@ -1,5 +1,7 @@
 var React = require('react');
 
+// Extracts data from the JSON objects received from API and builds the HTML to display it.
+
 module.exports = React.createClass({
   render: function () {
     var hourly = this.props.weather.hourly_forecast;
