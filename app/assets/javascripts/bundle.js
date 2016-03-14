@@ -47,10 +47,10 @@
 	var React = __webpack_require__(1),
 	    ReactDOM = __webpack_require__(158),
 	    Weather = __webpack_require__(159),
-	    LocationIndex = __webpack_require__(191),
-	    LocationApi = __webpack_require__(187),
-	    WeatherStore = __webpack_require__(169),
-	    LocationsStore = __webpack_require__(186);
+	    LocationIndex = __webpack_require__(193),
+	    LocationApi = __webpack_require__(189),
+	    WeatherStore = __webpack_require__(170),
+	    LocationsStore = __webpack_require__(187);
 	
 	// Main app rendered by ReactDOM, stores current location in state and passes to child
 	// components as a property along with a function to modify the state.
@@ -59,13 +59,20 @@
 	  displayName: 'WeatherApp',
 	
 	  getInitialState: function () {
-	    return { location: { name: "New York, NY" } };
+	    return { locations: LocationsStore.all() };
 	  },
 	  componentDidMount: function () {
+	    this.listener = LocationsStore.addListener(this.updateLocations);
 	    LocationApi.fetchLocations(this.changeLocation);
+	  },
+	  componentWillUnmount: function () {
+	    this.listener.remove();
 	  },
 	  changeLocation: function (location) {
 	    this.setState({ location: location });
+	  },
+	  updateLocations: function () {
+	    this.setState({ locations: LocationsStore.all() });
 	  },
 	  render: function () {
 	    if (!this.state.location) {
@@ -74,7 +81,7 @@
 	    return React.createElement(
 	      'div',
 	      { className: 'app group' },
-	      React.createElement(LocationIndex, { changeLocation: this.changeLocation }),
+	      React.createElement(LocationIndex, { locations: this.state.locations, changeLocation: this.changeLocation }),
 	      React.createElement(Weather, { changeLocation: this.changeLocation, location: this.state.location })
 	    );
 	  }
@@ -19692,12 +19699,11 @@
 
 	var React = __webpack_require__(1),
 	    Conditions = __webpack_require__(160),
-	    Hourly = __webpack_require__(194),
-	    WeatherApi = __webpack_require__(162),
-	    WeatherStore = __webpack_require__(169),
-	    ToggleLocation = __webpack_require__(185),
-	    Autocomplete = __webpack_require__(189),
-	    QueryUtil = __webpack_require__(190);
+	    Hourly = __webpack_require__(162),
+	    WeatherApi = __webpack_require__(163),
+	    WeatherStore = __webpack_require__(170),
+	    ToggleLocation = __webpack_require__(186),
+	    Autocomplete = __webpack_require__(191);
 	
 	// Weather component stores the weather of the current location in state, and
 	// listens for changes in the WeatherStore, updating state when change occurs.
@@ -19711,14 +19717,14 @@
 	  },
 	  componentDidMount: function () {
 	    this.listener = WeatherStore.addListener(this.updateState);
-	    var apiQuery = QueryUtil.parseLocation(this.props.location);
+	    var apiQuery = this.props.location.query;
 	    WeatherApi.fetchWeather(apiQuery);
 	  },
 	  componentWillUnmount: function () {
 	    this.listener.remove();
 	  },
 	  componentWillReceiveProps: function (newProps) {
-	    var apiQuery = QueryUtil.parseLocation(newProps.location);
+	    var apiQuery = newProps.location.query;
 	    WeatherApi.fetchWeather(apiQuery);
 	  },
 	  updateState: function () {
@@ -19768,7 +19774,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1),
-	    SunUtil = __webpack_require__(193);
+	    SunUtil = __webpack_require__(161);
 	
 	// Extracts data from the JSON objects received from API and builds the HTML to display it.
 	// SunUtil provides a method to extact sun phase data from the API object and make it ready to display.
@@ -19981,22 +19987,155 @@
 	});
 
 /***/ },
-/* 161 */,
+/* 161 */
+/***/ function(module, exports) {
+
+	// Builds an object with sunrise/sunset data extracted from API data.
+	// Takes extra precautions just in case sunset is in the AM and sunrise is PM.
+	
+	module.exports = {
+	  parseSunPhase: function (sunPhase) {
+	    var ampm, sunrise, sunset, hour;
+	    hour = parseInt(sunPhase.sunrise.hour);
+	    if (hour > 12) {
+	      hour -= 12;
+	      ampm = "PM";
+	    } else if (hour < 12) {
+	      ampm = "AM";
+	    } else {
+	      ampm = "PM";
+	    }
+	    sunrise = hour + ":" + sunPhase.sunrise.minute + " " + ampm;
+	    hour = parseInt(sunPhase.sunset.hour);
+	    if (hour > 12) {
+	      hour -= 12;
+	      ampm = "PM";
+	    } else if (hour < 12) {
+	      ampm = "AM";
+	    } else {
+	      ampm = "PM";
+	    }
+	    sunset = hour + ":" + sunPhase.sunset.minute + " " + ampm;
+	    return { sunrise: sunrise, sunset: sunset };
+	  }
+	};
+
+/***/ },
 /* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var WeatherActions = __webpack_require__(163);
+	var React = __webpack_require__(1);
+	
+	// Extracts data from the JSON objects received from API and builds the HTML to display it.
+	
+	module.exports = React.createClass({
+	  displayName: 'exports',
+	
+	  render: function () {
+	    var hourly = this.props.weather.hourly_forecast;
+	    var table = [];
+	    var ul, hour;
+	    for (var i = 0; i < 18; i++) {
+	      hour = hourly[i];
+	      ul = React.createElement(
+	        'ul',
+	        { key: i, className: 'group hour' },
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          hour.FCTTIME.civil
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          hour.temp.english + "°F"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          hour.feelslike.english + "°F"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-xxlg left group' },
+	          React.createElement(
+	            'div',
+	            { className: 'left' },
+	            React.createElement('img', { className: 'icon-sm', src: hour.icon_url })
+	          ),
+	          hour.condition
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          hour.humidity + "%"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          hour.wdir.dir + " " + hour.wspd.english + " mph"
+	        )
+	      );
+	      table.push(ul);
+	    }
+	    return React.createElement(
+	      'div',
+	      { className: 'hourly' },
+	      React.createElement(
+	        'h2',
+	        { className: 'hourly-header' },
+	        'Hourly Forecast (18 hours)'
+	      ),
+	      React.createElement(
+	        'ul',
+	        { className: 'table-heading group' },
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          'Time'
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          'Temp'
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          'Feels'
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-xxlg left' },
+	          'Description'
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          'Humidity'
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'col-lg left' },
+	          'Wind'
+	        )
+	      ),
+	      table
+	    );
+	  }
+	});
+
+/***/ },
+/* 163 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var WeatherActions = __webpack_require__(164);
 	
 	// Fetches weather report from Wunderground API via the rails server (to keep API key hidden).
 	
 	module.exports = {
-	  fetchWeather: function (apiQuery) {
-	    $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly/q/' + apiQuery, function (weather) {
-	      WeatherActions.updateWeather(weather);
-	    });
-	  },
-	  fetchWeatherAutocomplete: function (acQuery, cb) {
-	    $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly' + acQuery, function (weather) {
+	  fetchWeather: function (acQuery, cb) {
+	    $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly' + acQuery + ".json", function (weather) {
 	      WeatherActions.updateWeather(weather);
 	      cb && cb(weather.location);
 	    });
@@ -20004,11 +20143,11 @@
 	};
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(164),
-	    Constants = __webpack_require__(168);
+	var AppDispatcher = __webpack_require__(165),
+	    Constants = __webpack_require__(169);
 	
 	module.exports = {
 	  updateWeather: function (weather) {
@@ -20020,15 +20159,15 @@
 	};
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(165).Dispatcher;
+	var AppDispatcher = __webpack_require__(166).Dispatcher;
 	
 	module.exports = new AppDispatcher();
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20040,11 +20179,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Dispatcher = __webpack_require__(166);
+	module.exports.Dispatcher = __webpack_require__(167);
 
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20066,7 +20205,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(167);
+	var invariant = __webpack_require__(168);
 	
 	var _prefix = 'ID_';
 	
@@ -20281,7 +20420,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20336,7 +20475,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -20347,12 +20486,12 @@
 	};
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Store = __webpack_require__(170).Store,
-	    AppDispatcher = __webpack_require__(164),
-	    Constants = __webpack_require__(168),
+	var Store = __webpack_require__(171).Store,
+	    AppDispatcher = __webpack_require__(165),
+	    Constants = __webpack_require__(169),
 	    WeatherStore = new Store(AppDispatcher),
 	    _weather = {};
 	
@@ -20370,7 +20509,7 @@
 	module.exports = WeatherStore;
 
 /***/ },
-/* 170 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20382,15 +20521,15 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Container = __webpack_require__(171);
-	module.exports.MapStore = __webpack_require__(174);
-	module.exports.Mixin = __webpack_require__(184);
-	module.exports.ReduceStore = __webpack_require__(175);
-	module.exports.Store = __webpack_require__(176);
+	module.exports.Container = __webpack_require__(172);
+	module.exports.MapStore = __webpack_require__(175);
+	module.exports.Mixin = __webpack_require__(185);
+	module.exports.ReduceStore = __webpack_require__(176);
+	module.exports.Store = __webpack_require__(177);
 
 
 /***/ },
-/* 171 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20412,10 +20551,10 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxStoreGroup = __webpack_require__(172);
+	var FluxStoreGroup = __webpack_require__(173);
 	
-	var invariant = __webpack_require__(167);
-	var shallowEqual = __webpack_require__(173);
+	var invariant = __webpack_require__(168);
+	var shallowEqual = __webpack_require__(174);
 	
 	var DEFAULT_OPTIONS = {
 	  pure: true,
@@ -20573,7 +20712,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 172 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20592,7 +20731,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(167);
+	var invariant = __webpack_require__(168);
 	
 	/**
 	 * FluxStoreGroup allows you to execute a callback on every dispatch after
@@ -20654,7 +20793,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 173 */
+/* 174 */
 /***/ function(module, exports) {
 
 	/**
@@ -20709,7 +20848,7 @@
 	module.exports = shallowEqual;
 
 /***/ },
-/* 174 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20730,10 +20869,10 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxReduceStore = __webpack_require__(175);
-	var Immutable = __webpack_require__(183);
+	var FluxReduceStore = __webpack_require__(176);
+	var Immutable = __webpack_require__(184);
 	
-	var invariant = __webpack_require__(167);
+	var invariant = __webpack_require__(168);
 	
 	/**
 	 * This is a simple store. It allows caching key value pairs. An implementation
@@ -20859,7 +20998,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20880,10 +21019,10 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxStore = __webpack_require__(176);
+	var FluxStore = __webpack_require__(177);
 	
-	var abstractMethod = __webpack_require__(182);
-	var invariant = __webpack_require__(167);
+	var abstractMethod = __webpack_require__(183);
+	var invariant = __webpack_require__(168);
 	
 	var FluxReduceStore = (function (_FluxStore) {
 	  _inherits(FluxReduceStore, _FluxStore);
@@ -20966,7 +21105,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20985,11 +21124,11 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _require = __webpack_require__(177);
+	var _require = __webpack_require__(178);
 	
 	var EventEmitter = _require.EventEmitter;
 	
-	var invariant = __webpack_require__(167);
+	var invariant = __webpack_require__(168);
 	
 	/**
 	 * This class should be extended by the stores in your application, like so:
@@ -21149,7 +21288,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 177 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -21162,14 +21301,14 @@
 	 */
 	
 	var fbemitter = {
-	  EventEmitter: __webpack_require__(178)
+	  EventEmitter: __webpack_require__(179)
 	};
 	
 	module.exports = fbemitter;
 
 
 /***/ },
-/* 178 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21188,8 +21327,8 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var EmitterSubscription = __webpack_require__(179);
-	var EventSubscriptionVendor = __webpack_require__(181);
+	var EmitterSubscription = __webpack_require__(180);
+	var EventSubscriptionVendor = __webpack_require__(182);
 	
 	var emptyFunction = __webpack_require__(15);
 	var invariant = __webpack_require__(13);
@@ -21366,7 +21505,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 179 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -21387,7 +21526,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var EventSubscription = __webpack_require__(180);
+	var EventSubscription = __webpack_require__(181);
 	
 	/**
 	 * EmitterSubscription represents a subscription with listener and context data.
@@ -21419,7 +21558,7 @@
 	module.exports = EmitterSubscription;
 
 /***/ },
-/* 180 */
+/* 181 */
 /***/ function(module, exports) {
 
 	/**
@@ -21473,7 +21612,7 @@
 	module.exports = EventSubscription;
 
 /***/ },
-/* 181 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21582,7 +21721,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 182 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21599,7 +21738,7 @@
 	
 	'use strict';
 	
-	var invariant = __webpack_require__(167);
+	var invariant = __webpack_require__(168);
 	
 	function abstractMethod(className, methodName) {
 	   true ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Subclasses of %s must override %s() with their own implementation.', className, methodName) : invariant(false) : undefined;
@@ -21609,7 +21748,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 183 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26596,7 +26735,7 @@
 	}));
 
 /***/ },
-/* 184 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26613,9 +26752,9 @@
 	
 	'use strict';
 	
-	var FluxStoreGroup = __webpack_require__(172);
+	var FluxStoreGroup = __webpack_require__(173);
 	
-	var invariant = __webpack_require__(167);
+	var invariant = __webpack_require__(168);
 	
 	/**
 	 * `FluxContainer` should be preferred over this mixin, but it requires using
@@ -26719,13 +26858,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 185 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1),
-	    LocationsStore = __webpack_require__(186),
-	    LocationUtil = __webpack_require__(192),
-	    LocationApi = __webpack_require__(187);
+	    LocationsStore = __webpack_require__(187),
+	    LocationUtil = __webpack_require__(188),
+	    LocationApi = __webpack_require__(189);
 	
 	// ToggleLocation is responsible for determining whether a location is saved to a
 	// User's list or not, and displaying the appropriate button to add/remove the location.
@@ -26736,50 +26875,42 @@
 	  displayName: 'exports',
 	
 	  getInitialState: function () {
-	    var location = LocationUtil.convertLocation(this.props.location);
-	    var idx = LocationsStore.findIndexOf(location);
-	    var saved = idx === -1 ? false : true;
-	    return { saved: saved };
-	  },
-	  componentDidMount: function () {
-	    this.listener = LocationsStore.addListener(this.updateState);
-	  },
-	  componentWillUnmount: function () {
-	    this.listener.remove();
-	  },
-	  componentWillReceiveProps: function (newProps) {
-	    var location = LocationUtil.convertLocation(newProps.location);
-	    var idx = LocationsStore.findIndexOf(location);
-	    var saved = idx === -1 ? false : true;
-	    this.setState({ saved: saved });
+	    return { disabled: false };
 	  },
 	  addLocation: function () {
 	    var location = LocationUtil.convertLocation(this.props.location);
-	    LocationApi.addLocation(location.name);
+	    this.setState({ disabled: true });
+	    LocationApi.addLocation(location, function () {
+	      this.setState({ disabled: false });
+	    }.bind(this));
 	  },
 	  removeLocation: function () {
 	    var location = LocationUtil.convertLocation(this.props.location);
 	    var idx = LocationsStore.findIndexOf(location);
 	    var id = LocationsStore.all()[idx].id;
-	    LocationApi.removeLocation(id);
+	    this.setState({ saved: false, disabled: true });
+	    LocationApi.removeLocation(id, function () {
+	      this.setState({ disabled: false });
+	    }.bind(this));
 	  },
-	  updateState: function () {
+	  isSaved: function () {
 	    var location = LocationUtil.convertLocation(this.props.location);
 	    var idx = LocationsStore.findIndexOf(location);
-	    var saved = idx === -1 ? false : true;
-	    this.setState({ saved: saved });
+	    return idx === -1 ? false : true;
 	  },
 	  render: function () {
-	    if (this.state.saved) {
+	    var saved = this.isSaved();
+	    var disabled = LocationsStore.all().length === 5 || this.state.disabled;
+	    if (saved) {
 	      return React.createElement(
-	        'div',
-	        { className: 'toggle remove-button', onClick: this.removeLocation },
+	        'button',
+	        { className: 'toggle remove-button', disabled: this.state.disabled, onClick: this.removeLocation },
 	        'Remove Location'
 	      );
 	    } else {
 	      return React.createElement(
-	        'div',
-	        { className: 'toggle add-button', onClick: this.addLocation },
+	        'button',
+	        { className: 'toggle add-button', disabled: disabled, onClick: this.addLocation },
 	        'Add Location'
 	      );
 	    }
@@ -26787,12 +26918,12 @@
 	});
 
 /***/ },
-/* 186 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Store = __webpack_require__(170).Store,
-	    AppDispatcher = __webpack_require__(164),
-	    Constants = __webpack_require__(168),
+	var Store = __webpack_require__(171).Store,
+	    AppDispatcher = __webpack_require__(165),
+	    Constants = __webpack_require__(169),
 	    LocationsStore = new Store(AppDispatcher),
 	    _locations = [];
 	
@@ -26832,10 +26963,24 @@
 	module.exports = LocationsStore;
 
 /***/ },
-/* 187 */
+/* 188 */
+/***/ function(module, exports) {
+
+	// Builds an object out of API location data that can be read by the LocationsStore
+	
+	module.exports = {
+	  convertLocation: function (location) {
+	    var city = location.city;
+	    var province = location.state ? location.state : location.country;
+	    return { name: city + ", " + province, query: location.l };
+	  }
+	};
+
+/***/ },
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var LocationActions = __webpack_require__(188);
+	var LocationActions = __webpack_require__(190);
 	
 	// This API is responsible for retrieving a User's locations, adding a location,
 	// removing a location, and sending requests to the autocomplete API.
@@ -26844,10 +26989,14 @@
 	  fetchLocations: function (cb) {
 	    $.get('/api/locations', function (locations) {
 	      LocationActions.setLocations(locations);
-	      cb && cb(locations[0]); // Used to automatically load the first saved location when page loads.
+	      if (locations.length > 0) {
+	        cb && cb(locations[0]); // Used to load the first saved location's weather, if there is one.
+	      } else {
+	          cb && cb({ name: "New York, NY", query: "/q/zmw:10001.1.99999" });
+	        }
 	    });
 	  },
-	  addLocation: function (location) {
+	  addLocation: function (location, cb) {
 	    $.ajax({
 	      type: "POST",
 	      url: "/api/locations",
@@ -26855,18 +27004,20 @@
 	      data: { location: location },
 	      success: function (location) {
 	        LocationActions.addLocation(location);
+	        cb && cb();
 	      },
 	      error: function (e) {
 	        alert("An error occurred, please try again soon.");
 	      }
 	    });
 	  },
-	  removeLocation: function (id) {
+	  removeLocation: function (id, cb) {
 	    $.ajax({
 	      type: "DELETE",
 	      url: "/api/locations/" + id,
 	      success: function (location) {
 	        LocationActions.removeLocation(location);
+	        cb && cb();
 	      },
 	      error: function (e) {
 	        alert("An error occurred, please try again soon.");
@@ -26889,11 +27040,11 @@
 	};
 
 /***/ },
-/* 188 */
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(164),
-	    Constants = __webpack_require__(168);
+	var AppDispatcher = __webpack_require__(165),
+	    Constants = __webpack_require__(169);
 	
 	module.exports = {
 	  setLocations: function (locations) {
@@ -26917,13 +27068,13 @@
 	};
 
 /***/ },
-/* 189 */
+/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1),
-	    LocationApi = __webpack_require__(187),
-	    LocationUtil = __webpack_require__(192),
-	    WeatherApi = __webpack_require__(162);
+	    LocationApi = __webpack_require__(189),
+	    LocationUtil = __webpack_require__(188),
+	    WeatherApi = __webpack_require__(163);
 	
 	// Autocomplete uses the Wunderground autocomplete API to list matching results
 	// as the search is being typed. LocationUtil is used to extract information about
@@ -26947,12 +27098,8 @@
 	  },
 	  changeLocation: function (result) {
 	    return function () {
-	      var callback = function (loc) {
-	        var location = LocationUtil.convertLocation(loc);
-	        this.props.changeLocation(location);
-	      }.bind(this);
-	      this.setState({ query: "", results: {} });
-	      WeatherApi.fetchWeatherAutocomplete(result.l + ".json", callback);
+	      var location = { name: result.name, query: result.l };
+	      this.props.changeLocation(location);
 	    }.bind(this);
 	  },
 	  clearList: function () {
@@ -26984,30 +27131,13 @@
 	});
 
 /***/ },
-/* 190 */
-/***/ function(module, exports) {
-
-	// Builds a query string out of a location object that can be understood by API.
-	
-	module.exports = {
-	  parseLocation: function (location) {
-	    if (!location.name) {
-	      debugger;
-	    }
-	    var cityState = location.name.split(",");
-	    var city = cityState[0].trim();
-	    var state = cityState[1].trim();
-	    return state + "/" + city + ".json";
-	  }
-	};
-
-/***/ },
-/* 191 */
+/* 192 */,
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1),
-	    LocationsStore = __webpack_require__(186),
-	    LocationApi = __webpack_require__(187);
+	    LocationsStore = __webpack_require__(187),
+	    LocationApi = __webpack_require__(189);
 	
 	// LocationIndex is a side bar displaying User's saved locations.
 	// Each list item has an onClick handler that will update the state of the parent.
@@ -27015,194 +27145,24 @@
 	module.exports = React.createClass({
 	  displayName: 'exports',
 	
-	  getInitialState: function () {
-	    return { locations: LocationsStore.all() };
-	  },
-	  componentDidMount: function () {
-	    this.listener = LocationsStore.addListener(this.updateState);
-	    LocationApi.fetchLocations();
-	  },
-	  componentWillUnmount: function () {
-	    this.listener.remove();
-	  },
 	  changeLocation: function (location) {
 	    return function () {
 	      this.props.changeLocation(location);
 	    }.bind(this);
 	  },
-	  updateState: function () {
-	    this.setState({ locations: LocationsStore.all() });
-	  },
 	  render: function () {
 	    var changeLocation = this.changeLocation;
-	    var names = this.state.locations.map(function (loc, i) {
+	    var names = this.props.locations.map(function (loc, i) {
 	      return React.createElement(
-	        'li',
-	        { key: i, onClick: changeLocation(loc) },
+	        'div',
+	        { key: i, className: 'location', onClick: changeLocation(loc) },
 	        loc.name
 	      );
 	    });
 	    return React.createElement(
 	      'nav',
-	      { className: 'locations left' },
-	      React.createElement(
-	        'ul',
-	        null,
-	        names
-	      )
-	    );
-	  }
-	});
-
-/***/ },
-/* 192 */
-/***/ function(module, exports) {
-
-	// Builds an object out of API location data that can be read by the LocationsStore
-	
-	module.exports = {
-	  convertLocation: function (location) {
-	    var city = location.city;
-	    var province = location.state ? location.state : location.country;
-	    return { name: city + ", " + province };
-	  }
-	};
-
-/***/ },
-/* 193 */
-/***/ function(module, exports) {
-
-	// Builds an object with sunrise/sunset data extracted from API data.
-	// Takes extra precautions just in case sunset is in the AM and sunrise is PM.
-	
-	module.exports = {
-	  parseSunPhase: function (sunPhase) {
-	    var ampm, sunrise, sunset, hour;
-	    hour = parseInt(sunPhase.sunrise.hour);
-	    if (hour > 12) {
-	      hour -= 12;
-	      ampm = "PM";
-	    } else if (hour < 12) {
-	      ampm = "AM";
-	    } else {
-	      ampm = "PM";
-	    }
-	    sunrise = hour + ":" + sunPhase.sunrise.minute + " " + ampm;
-	    hour = parseInt(sunPhase.sunset.hour);
-	    if (hour > 12) {
-	      hour -= 12;
-	      ampm = "PM";
-	    } else if (hour < 12) {
-	      ampm = "AM";
-	    } else {
-	      ampm = "PM";
-	    }
-	    sunset = hour + ":" + sunPhase.sunset.minute + " " + ampm;
-	    return { sunrise: sunrise, sunset: sunset };
-	  }
-	};
-
-/***/ },
-/* 194 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	
-	// Extracts data from the JSON objects received from API and builds the HTML to display it.
-	
-	module.exports = React.createClass({
-	  displayName: 'exports',
-	
-	  render: function () {
-	    var hourly = this.props.weather.hourly_forecast;
-	    var table = [];
-	    var ul, hour;
-	    for (var i = 0; i < 18; i++) {
-	      hour = hourly[i];
-	      ul = React.createElement(
-	        'ul',
-	        { key: i, className: 'group hour' },
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.FCTTIME.civil
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.temp.english + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.feelslike.english + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-xxlg left group' },
-	          React.createElement(
-	            'div',
-	            { className: 'left' },
-	            React.createElement('img', { className: 'icon-sm', src: hour.icon_url })
-	          ),
-	          hour.condition
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.humidity + "%"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.wdir.dir + " " + hour.wspd.english + " mph"
-	        )
-	      );
-	      table.push(ul);
-	    }
-	    return React.createElement(
-	      'div',
-	      { className: 'hourly' },
-	      React.createElement(
-	        'h2',
-	        { className: 'hourly-header' },
-	        'Hourly Forecast (18 hours)'
-	      ),
-	      React.createElement(
-	        'ul',
-	        { className: 'table-heading group' },
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Time'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Temp'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Feels'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-xxlg left' },
-	          'Description'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Humidity'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Wind'
-	        )
-	      ),
-	      table
+	      { className: 'location-nav group' },
+	      names
 	    );
 	  }
 	});

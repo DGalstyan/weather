@@ -11,19 +11,26 @@ var React = require('react'),
 
 var WeatherApp = React.createClass({
   getInitialState: function () {
-    return { location: { name: "New York, NY"} };
+    return { locations: LocationsStore.all() };
   },
   componentDidMount: function () {
+    this.listener = LocationsStore.addListener(this.updateLocations);
     LocationApi.fetchLocations(this.changeLocation);
+  },
+  componentWillUnmount: function () {
+    this.listener.remove();
   },
   changeLocation: function (location) {
     this.setState({ location: location });
+  },
+  updateLocations: function () {
+    this.setState({ locations: LocationsStore.all() });
   },
   render: function () {
     if (!this.state.location) { return <div></div>; }
     return (
       <div className="app group">
-        <LocationIndex changeLocation={this.changeLocation} />
+        <LocationIndex locations={this.state.locations} changeLocation={this.changeLocation} />
         <Weather changeLocation={this.changeLocation} location={this.state.location} />
       </div>
     );

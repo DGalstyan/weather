@@ -4,8 +4,7 @@ var React = require('react'),
     WeatherApi = require('../apiUtils/WeatherApi'),
     WeatherStore = require('../stores/weather'),
     ToggleLocation = require('./ToggleLocation'),
-    Autocomplete = require('./Autocomplete'),
-    QueryUtil = require('../apiUtils/QueryUtil');
+    Autocomplete = require('./Autocomplete');
 
 // Weather component stores the weather of the current location in state, and
 // listens for changes in the WeatherStore, updating state when change occurs.
@@ -17,14 +16,14 @@ module.exports = React.createClass({
   },
   componentDidMount: function () {
     this.listener = WeatherStore.addListener(this.updateState);
-    var apiQuery = QueryUtil.parseLocation(this.props.location);
+    var apiQuery = this.props.location.query;
     WeatherApi.fetchWeather(apiQuery);
   },
   componentWillUnmount: function () {
     this.listener.remove();
   },
   componentWillReceiveProps: function (newProps) {
-    var apiQuery = QueryUtil.parseLocation(newProps.location);
+    var apiQuery = newProps.location.query;
     WeatherApi.fetchWeather(apiQuery);
   },
   updateState: function () {

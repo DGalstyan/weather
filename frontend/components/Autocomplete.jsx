@@ -23,12 +23,8 @@ module.exports = React.createClass({
   },
   changeLocation: function (result) {
     return function () {
-      var callback = function (loc) {
-        var location = LocationUtil.convertLocation(loc);
-        this.props.changeLocation(location);
-      }.bind(this);
-      this.setState({ query: "", results: {} });
-      WeatherApi.fetchWeatherAutocomplete(result.l + ".json", callback);
+      var location = { name: result.name, query: result.l }
+      this.props.changeLocation(location);
     }.bind(this);
   },
   clearList: function () {

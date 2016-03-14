@@ -24,7 +24,7 @@
     text-align: inherit;
     text-decoration: inherit;
     vertical-align: inherit;
-    box-sizing: content-box;
+    box-sizing: inherit;
     font: inherit;
     color: inherit;
     background: transparent;
@@ -56,27 +56,31 @@ ul {
 .app {
   margin: auto;
   width: 1000px;
-  border-right: 1px solid black; /* ************** */
+  background: #e8faff;
 }
-.locations ul {
+.location-nav {
+  height: 48px;
   border-top: 1px solid black;
-  width: 140px;
-  border-left: 1px solid black;
   border-right: 1px solid black;
-}
-.locations li {
-  padding: 5px 10px;
-  cursor: pointer;
   border-bottom: 1px solid black;
+  width: 1000px;
+  background: white;
 }
-.locations li:hover {
+.location {
+  box-sizing: border-box;
+  float: left;
+  border-left: 1px solid black;
+  padding: 13px 0;
+  text-align: center;
+  width: 200px;
+}
+.location:hover {
   cursor: pointer;
   background: #ddd
 }
 .weather {
-  padding: 0 20px;
+  padding: 10px 20px;
   display: block;
-  background: #e8faff;
   width: 818px;
 }
 h1 {
@@ -112,6 +116,13 @@ h2 {
 }
 .toggle:hover {
   opacity: 0.7;
+}
+.toggle:disabled {
+  background: lightgrey;
+  cursor: default;
+}
+.toggle:disabled:hover {
+  opacity: 1;
 }
 .add-button {
   background: green;

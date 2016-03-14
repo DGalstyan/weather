@@ -7,10 +7,14 @@ module.exports = {
   fetchLocations: function (cb) {
     $.get('/api/locations', function (locations) {
       LocationActions.setLocations(locations);
-      cb && cb(locations[0]); // Used to automatically load the first saved location when page loads.
+      if (locations.length > 0) {
+        cb && cb(locations[0]); // Used to load the first saved location's weather, if there is one.
+      } else {
+        cb && cb({ name: "New York, NY", query: "/q/zmw:10001.1.99999" });
+      }
     });
   },
-  addLocation: function (location) {
+  addLocation: function (location, cb) {
     $.ajax({
       type: "POST",
       url: "/api/locations",
@@ -18,18 +22,20 @@ module.exports = {
       data: { location: location },
       success: function (location) {
         LocationActions.addLocation(location);
+        cb && cb();
       },
       error: function (e) {
         alert("An error occurred, please try again soon.");
       }
     });
   },
-  removeLocation: function (id) {
+  removeLocation: function (id, cb) {
     $.ajax({
       type: "DELETE",
       url: "/api/locations/" + id,
       success: function (location) {
         LocationActions.removeLocation(location);
+        cb && cb();
       },
       error: function (e) {
         alert("An error occurred, please try again soon.");

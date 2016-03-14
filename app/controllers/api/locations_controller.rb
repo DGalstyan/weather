@@ -8,7 +8,7 @@ class Api::LocationsController < ApplicationController
 
   def create
     location = params[:location]
-    new_loc = current_user.locations.create(name: location)
+    new_loc = current_user.locations.create(name: location[:name], query: location[:query])
     render json: new_loc
   end
 

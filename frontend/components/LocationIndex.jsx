@@ -6,32 +6,19 @@ var React = require('react'),
 // Each list item has an onClick handler that will update the state of the parent.
 
 module.exports = React.createClass({
-  getInitialState: function () {
-    return { locations: LocationsStore.all() };
-  },
-  componentDidMount: function () {
-    this.listener = LocationsStore.addListener(this.updateState);
-    LocationApi.fetchLocations();
-  },
-  componentWillUnmount: function () {
-    this.listener.remove();
-  },
   changeLocation: function (location) {
     return function () {
       this.props.changeLocation(location);
     }.bind(this);
   },
-  updateState: function () {
-    this.setState({ locations: LocationsStore.all() });
-  },
   render: function () {
     var changeLocation = this.changeLocation;
-    var names = this.state.locations.map(function(loc, i) {
-      return <li key={i} onClick={changeLocation(loc)}>{loc.name}</li>;
+    var names = this.props.locations.map(function(loc, i) {
+      return <div key={i} className="location" onClick={changeLocation(loc)}>{loc.name}</div>;
     });
     return (
-      <nav className='locations left'>
-        <ul>{names}</ul>
+      <nav className='location-nav group'>
+        {names}
       </nav>
     );
   }
