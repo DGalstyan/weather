@@ -1,7 +1,13 @@
 class User < ActiveRecord::Base
   validates :token, presence: true
   has_many :locations
+  validates_length_of :locations, :maximum => 5
   after_save :add_default_locations
+
+  def self.generate
+    new_token = SecureRandom.urlsafe_base64
+    User.create(token: new_token)
+  end
 
   private
   def add_default_locations

@@ -11,9 +11,8 @@ class ApplicationController < ActionController::Base
   def verify_cookie
     token = cookies.permanent[:token]
     if token.nil?
-      new_token = SecureRandom.urlsafe_base64
-      User.create(token: new_token)
-      cookies.permanent[:token] = new_token
+      user = User.generate
+      cookies.permanent[:token] = user[:token]
     end
   end
 end

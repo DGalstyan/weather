@@ -19,6 +19,12 @@ Autocomplete also interfaces with a Wunderground API, but does not require a key
 ### ToggleLocation
 This component determines if the current location is saved in the User's list, and provides the correct Add/Remove action accordingly. This requires the use of the LocationUtil.convertLocation method to convert the location object received from the API into an object that can be compared the the locations saved in the database and LocationsStore.
 
+## TESTING
+
+### RSpec Model Tests
+Rails model and association validations are tested using RSpec.  Test files are located in /spec, to run tests use the command 
+`bundle exec rspec`
+
 ## DEPLOYMENT
 
 ### Node
