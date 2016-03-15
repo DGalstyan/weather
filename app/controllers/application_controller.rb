@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   private
   def verify_cookie
     token = cookies.permanent[:token]
-    if token.nil?
+    if token.nil? || current_user.nil?
       user = User.generate
       cookies.permanent[:token] = user[:token]
     end
