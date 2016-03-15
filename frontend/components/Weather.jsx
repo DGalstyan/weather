@@ -25,7 +25,9 @@ module.exports = React.createClass({
   },
   componentWillReceiveProps: function (newProps) {
     var apiQuery = newProps.location.query;
-    WeatherApi.fetchWeather(apiQuery);
+    if (newProps.location.query != this.props.location.query) {
+      WeatherApi.fetchWeather(apiQuery);
+    }
   },
   updateState: function () {
     this.setState({ weather: WeatherStore.get() });

@@ -19726,7 +19726,9 @@
 	  },
 	  componentWillReceiveProps: function (newProps) {
 	    var apiQuery = newProps.location.query;
-	    WeatherApi.fetchWeather(apiQuery);
+	    if (newProps.location.query != this.props.location.query) {
+	      WeatherApi.fetchWeather(apiQuery);
+	    }
 	  },
 	  updateState: function () {
 	    this.setState({ weather: WeatherStore.get() });
@@ -19774,64 +19776,21 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1),
-	    SunUtil = __webpack_require__(161);
+	    ConditionsUtils = __webpack_require__(193);
 	
 	// Extracts data from the JSON objects received from API and builds the HTML to display it.
-	// SunUtil provides a method to extact sun phase data from the API object and make it ready to display.
 	
 	module.exports = React.createClass({
 	  displayName: 'exports',
 	
 	  render: function () {
 	    var w = this.props.weather;
+	    var currentTemp = ConditionsUtils.buildCurrentTemp(w);
+	    var conditionsHeading = ConditionsUtils.buildConditionsHeading();
+	    var conditionsTable = ConditionsUtils.buildConditionsTable(w);
+	    var forecastHeading = ConditionsUtils.buildForecastHeading();
+	    var forecastTable = ConditionsUtils.buildForecastTable(w);
 	    var alert = w.alerts.length != 0 ? w.alerts[0].description : "";
-	    var table = [];
-	    var day, ul, abbreviation;
-	    var sunPhase = SunUtil.parseSunPhase(w.sun_phase);
-	    for (var i = 1; i < 8; i++) {
-	      day = w.forecast.simpleforecast.forecastday[i];
-	      abbreviation = day.date.weekday.slice(0, 3).toUpperCase();
-	      ul = React.createElement(
-	        'ul',
-	        { key: i, className: 'short-forecast-table group' },
-	        React.createElement(
-	          'li',
-	          { className: 'left col-md' },
-	          abbreviation
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-xlg group' },
-	          React.createElement(
-	            'div',
-	            { className: 'left' },
-	            React.createElement('img', { className: 'icon-sm', src: day.icon_url, width: 25 })
-	          ),
-	          day.conditions
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-sm' },
-	          day.high.fahrenheit + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-sm' },
-	          day.low.fahrenheit + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-lg' },
-	          day.avewind.dir + " " + day.avewind.mph + " mph"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-md' },
-	          day.avehumidity + "%"
-	        )
-	      );
-	      table.push(ul);
-	    }
 	    return React.createElement(
 	      'div',
 	      { className: 'conditions group' },
@@ -19839,27 +19798,7 @@
 	        'div',
 	        { className: 'current left group' },
 	        React.createElement('img', { className: 'icon left', src: w.current_observation.icon_url }),
-	        React.createElement(
-	          'div',
-	          { className: 'left temp' },
-	          React.createElement(
-	            'h1',
-	            null,
-	            Math.round(w.current_observation.temp_f)
-	          ),
-	          React.createElement(
-	            'h2',
-	            { className: 'degrees' },
-	            '°F'
-	          ),
-	          React.createElement(
-	            'h4',
-	            { className: 'italics' },
-	            'Feels like ',
-	            Math.round(w.current_observation.feelslike_f),
-	            '°'
-	          )
-	        ),
+	        currentTemp,
 	        React.createElement(
 	          'h2',
 	          { className: 'current-weather' },
@@ -19873,114 +19812,20 @@
 	        React.createElement(
 	          'div',
 	          { className: 'current-stats group' },
-	          React.createElement(
-	            'ul',
-	            { className: 'left' },
-	            React.createElement(
-	              'li',
-	              null,
-	              'Wind'
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              'Humidity'
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              'Dew Point'
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              'Pressure'
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              'Sunrise'
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              'Sunset'
-	            )
-	          ),
-	          React.createElement(
-	            'ul',
-	            { className: 'right text-right' },
-	            React.createElement(
-	              'li',
-	              null,
-	              w.current_observation.wind_dir + " " + Math.round(w.current_observation.wind_mph) + " mph"
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              w.current_observation.relative_humidity
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              w.current_observation.dewpoint_f + "°F"
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              w.current_observation.pressure_in + " in"
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              sunPhase.sunrise
-	            ),
-	            React.createElement(
-	              'li',
-	              null,
-	              sunPhase.sunset
-	            )
-	          )
+	          conditionsHeading,
+	          conditionsTable
 	        )
 	      ),
 	      React.createElement(
 	        'div',
 	        { className: 'short-forecast right' },
 	        React.createElement(
-	          'ul',
-	          { className: 'short-forecast table-heading group' },
-	          React.createElement(
-	            'li',
-	            { className: 'left col-md' },
-	            'Day'
-	          ),
-	          React.createElement(
-	            'li',
-	            { className: 'left col-xlg' },
-	            'Description'
-	          ),
-	          React.createElement(
-	            'li',
-	            { className: 'left col-sm' },
-	            'High'
-	          ),
-	          React.createElement(
-	            'li',
-	            { className: 'left col-sm' },
-	            'Low'
-	          ),
-	          React.createElement(
-	            'li',
-	            { className: 'left col-lg' },
-	            'Wind'
-	          ),
-	          React.createElement(
-	            'li',
-	            { className: 'left col-md' },
-	            'Humidity'
-	          )
+	          'h2',
+	          null,
+	          '5-day Forecast'
 	        ),
-	        table
+	        forecastHeading,
+	        forecastTable
 	      )
 	    );
 	  }
@@ -20024,7 +19869,8 @@
 /* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(1);
+	var React = __webpack_require__(1),
+	    HourlyUtils = __webpack_require__(192);
 	
 	// Extracts data from the JSON objects received from API and builds the HTML to display it.
 	
@@ -20033,51 +19879,8 @@
 	
 	  render: function () {
 	    var hourly = this.props.weather.hourly_forecast;
-	    var table = [];
-	    var ul, hour;
-	    for (var i = 0; i < 18; i++) {
-	      hour = hourly[i];
-	      ul = React.createElement(
-	        'ul',
-	        { key: i, className: 'group hour' },
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.FCTTIME.civil
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.temp.english + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.feelslike.english + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-xxlg left group' },
-	          React.createElement(
-	            'div',
-	            { className: 'left' },
-	            React.createElement('img', { className: 'icon-sm', src: hour.icon_url })
-	          ),
-	          hour.condition
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.humidity + "%"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          hour.wdir.dir + " " + hour.wspd.english + " mph"
-	        )
-	      );
-	      table.push(ul);
-	    }
+	    var header = HourlyUtils.buildHeader();
+	    var table = HourlyUtils.buildTable(hourly);
 	    return React.createElement(
 	      'div',
 	      { className: 'hourly' },
@@ -20086,40 +19889,7 @@
 	        { className: 'hourly-header' },
 	        'Hourly Forecast (18 hours)'
 	      ),
-	      React.createElement(
-	        'ul',
-	        { className: 'table-heading group' },
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Time'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Temp'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Feels'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-xxlg left' },
-	          'Description'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Humidity'
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'col-lg left' },
-	          'Wind'
-	        )
-	      ),
+	      header,
 	      table
 	    );
 	  }
@@ -20137,6 +19907,7 @@
 	  fetchWeather: function (acQuery, cb) {
 	    $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly' + acQuery + ".json", function (weather) {
 	      WeatherActions.updateWeather(weather);
+	      console.log(weather);
 	      cb && cb(weather.location);
 	    });
 	  }
@@ -36905,6 +36676,294 @@
 	return jQuery;
 	}));
 
+
+/***/ },
+/* 192 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	
+	module.exports = {
+	  buildTable: function (hourly) {
+	    var table = [];
+	    for (var i = 0; i < 18; i++) {
+	      hour = hourly[i];
+	      ul = this.buildList(hour, i);
+	      table.push(ul);
+	    }
+	    return table;
+	  },
+	  buildList: function (hour, i) {
+	    return React.createElement(
+	      'ul',
+	      { key: i, className: 'group hour' },
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        hour.FCTTIME.civil
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        hour.temp.english + "°F"
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        hour.feelslike.english + "°F"
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xxlg left group' },
+	        React.createElement(
+	          'div',
+	          { className: 'left' },
+	          React.createElement('img', { className: 'icon-sm', src: hour.icon_url })
+	        ),
+	        hour.condition
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        hour.humidity + "%"
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        hour.wdir.dir + " " + hour.wspd.english + " mph"
+	      )
+	    );
+	  },
+	  buildHeader: function () {
+	    return React.createElement(
+	      'ul',
+	      { className: 'table-heading group' },
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        'Time'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        'Temp'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        'Feels'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xxlg left' },
+	        'Description'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        'Humidity'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        'Wind'
+	      )
+	    );
+	  }
+	};
+
+/***/ },
+/* 193 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1),
+	    SunUtil = __webpack_require__(161);
+	
+	// SunUtil provides a method to extact sun phase data from the API object and make it ready to display.
+	
+	module.exports = {
+	  buildCurrentTemp: function (w) {
+	    return React.createElement(
+	      'div',
+	      { className: 'left temp' },
+	      React.createElement(
+	        'h1',
+	        null,
+	        Math.round(w.current_observation.temp_f)
+	      ),
+	      React.createElement(
+	        'h2',
+	        { className: 'degrees' },
+	        '°F'
+	      ),
+	      React.createElement(
+	        'h4',
+	        { className: 'italics' },
+	        'Feels like ',
+	        Math.round(w.current_observation.feelslike_f),
+	        '°'
+	      )
+	    );
+	  },
+	  buildConditionsHeading: function () {
+	    return React.createElement(
+	      'ul',
+	      { className: 'left' },
+	      React.createElement(
+	        'li',
+	        null,
+	        'Wind'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Humidity'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Dew Point'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Pressure'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Sunrise'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Sunset'
+	      )
+	    );
+	  },
+	  buildConditionsTable: function (w) {
+	    var sunPhase = SunUtil.parseSunPhase(w.sun_phase);
+	    return React.createElement(
+	      'ul',
+	      { className: 'right text-right' },
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.wind_dir + " " + Math.round(w.current_observation.wind_mph) + " mph"
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.relative_humidity
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.dewpoint_f + "°F"
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.pressure_in + " in"
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        sunPhase.sunrise
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        sunPhase.sunset
+	      )
+	    );
+	  },
+	  buildForecastHeading: function () {
+	    return React.createElement(
+	      'ul',
+	      { className: 'short-forecast table-heading group' },
+	      React.createElement(
+	        'li',
+	        { className: 'left col-md' },
+	        'Day'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-xlg' },
+	        'Description'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-sm' },
+	        'High'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-sm' },
+	        'Low'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-lg' },
+	        'Wind'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-md' },
+	        'Humidity'
+	      )
+	    );
+	  },
+	  buildForecastTable: function (weather) {
+	    var table = [];
+	    var day, abbreviation, ul;
+	    for (var i = 1; i < 6; i++) {
+	      day = weather.forecast.simpleforecast.forecastday[i];
+	      abbreviation = day.date.weekday.slice(0, 3).toUpperCase();
+	      ul = React.createElement(
+	        'ul',
+	        { key: i, className: 'short-forecast-table group' },
+	        React.createElement(
+	          'li',
+	          { className: 'left col-md' },
+	          abbreviation
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-xlg group' },
+	          React.createElement(
+	            'div',
+	            { className: 'left' },
+	            React.createElement('img', { className: 'icon-sm', src: day.icon_url, width: 25 })
+	          ),
+	          day.conditions
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-sm' },
+	          day.high.fahrenheit + "°F"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-sm' },
+	          day.low.fahrenheit + "°F"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-lg' },
+	          day.avewind.dir + " " + day.avewind.mph + " mph"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-md' },
+	          day.avehumidity + "%"
+	        )
+	      );
+	      table.push(ul);
+	    }
+	    return table;
+	  }
+	};
 
 /***/ }
 /******/ ]);

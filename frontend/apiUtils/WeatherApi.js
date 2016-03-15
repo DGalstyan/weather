@@ -6,6 +6,7 @@ module.exports = {
   fetchWeather: function (acQuery, cb) {
     $.get('/api/weather?api_query=forecast10day/alerts/astronomy/conditions/geolookup/hourly' + acQuery + ".json", function (weather) {
       WeatherActions.updateWeather(weather);
+      console.log(weather);
       cb && cb(weather.location);
     });
   }
