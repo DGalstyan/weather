@@ -47,10 +47,10 @@
 	var React = __webpack_require__(1),
 	    ReactDOM = __webpack_require__(158),
 	    Weather = __webpack_require__(159),
-	    LocationIndex = __webpack_require__(190),
-	    LocationApi = __webpack_require__(187),
-	    WeatherStore = __webpack_require__(169),
-	    LocationsStore = __webpack_require__(185);
+	    LocationIndex = __webpack_require__(193),
+	    LocationApi = __webpack_require__(190),
+	    WeatherStore = __webpack_require__(171),
+	    LocationsStore = __webpack_require__(188);
 	
 	// Main app rendered by ReactDOM, stores current location in state and passes to child
 	// components as a property along with a function to modify the state.
@@ -19699,12 +19699,12 @@
 
 	var React = __webpack_require__(1),
 	    Conditions = __webpack_require__(160),
-	    Hourly = __webpack_require__(162),
-	    WeatherApi = __webpack_require__(163),
-	    WeatherStore = __webpack_require__(169),
-	    ToggleLocation = __webpack_require__(184),
-	    Autocomplete = __webpack_require__(189),
-	    LocationUtil = __webpack_require__(186);
+	    Hourly = __webpack_require__(163),
+	    WeatherApi = __webpack_require__(165),
+	    WeatherStore = __webpack_require__(171),
+	    ToggleLocation = __webpack_require__(187),
+	    Autocomplete = __webpack_require__(192),
+	    LocationUtil = __webpack_require__(189);
 	
 	// Weather component stores the weather of the current location in state, and
 	// listens for changes in the WeatherStore, updating state when change occurs.
@@ -19775,7 +19775,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1),
-	    ConditionsUtils = __webpack_require__(193);
+	    ConditionsUtils = __webpack_require__(161);
 	
 	// Extracts data from the JSON objects received from API and builds the HTML to display it.
 	
@@ -19832,6 +19832,199 @@
 
 /***/ },
 /* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1),
+	    SunUtil = __webpack_require__(162);
+	
+	// SunUtil provides a method to extact sun phase data from the API object and make it ready to display.
+	
+	module.exports = {
+	  buildCurrentTemp: function (w) {
+	    return React.createElement(
+	      'div',
+	      { className: 'left temp' },
+	      React.createElement(
+	        'h1',
+	        null,
+	        Math.round(w.current_observation.temp_f)
+	      ),
+	      React.createElement(
+	        'h2',
+	        { className: 'degrees' },
+	        '°F'
+	      ),
+	      React.createElement(
+	        'h4',
+	        { className: 'italics' },
+	        'Feels like ',
+	        Math.round(w.current_observation.feelslike_f),
+	        '°'
+	      )
+	    );
+	  },
+	  buildConditionsHeading: function () {
+	    return React.createElement(
+	      'ul',
+	      { className: 'left' },
+	      React.createElement(
+	        'li',
+	        null,
+	        'Wind'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Humidity'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Dew Point'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Pressure'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Sunrise'
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        'Sunset'
+	      )
+	    );
+	  },
+	  buildConditionsTable: function (w) {
+	    var sunPhase = SunUtil.parseSunPhase(w.sun_phase);
+	    return React.createElement(
+	      'ul',
+	      { className: 'right text-right' },
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.wind_dir + " " + Math.round(w.current_observation.wind_mph) + " mph"
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.relative_humidity
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.dewpoint_f + "°F"
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        w.current_observation.pressure_in + " in"
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        sunPhase.sunrise
+	      ),
+	      React.createElement(
+	        'li',
+	        null,
+	        sunPhase.sunset
+	      )
+	    );
+	  },
+	  buildForecastHeading: function () {
+	    return React.createElement(
+	      'ul',
+	      { className: 'short-forecast table-heading group' },
+	      React.createElement(
+	        'li',
+	        { className: 'left col-md' },
+	        'Day'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-xlg' },
+	        'Description'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-sm' },
+	        'High'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-sm' },
+	        'Low'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-lg' },
+	        'Wind'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'left col-md' },
+	        'Humidity'
+	      )
+	    );
+	  },
+	  buildForecastTable: function (weather) {
+	    var table = [];
+	    var day, abbreviation, ul;
+	    for (var i = 1; i < 6; i++) {
+	      day = weather.forecast.simpleforecast.forecastday[i];
+	      abbreviation = day.date.weekday.slice(0, 3).toUpperCase();
+	      ul = React.createElement(
+	        'ul',
+	        { key: i, className: 'short-forecast-table group' },
+	        React.createElement(
+	          'li',
+	          { className: 'left col-md' },
+	          abbreviation
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-xlg group' },
+	          React.createElement(
+	            'div',
+	            { className: 'left' },
+	            React.createElement('img', { className: 'icon-sm', src: day.icon_url, width: 25 })
+	          ),
+	          day.conditions
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-sm' },
+	          day.high.fahrenheit + "°F"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-sm' },
+	          day.low.fahrenheit + "°F"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-lg' },
+	          day.avewind.dir + " " + day.avewind.mph + " mph"
+	        ),
+	        React.createElement(
+	          'li',
+	          { className: 'left col-md' },
+	          day.avehumidity + "%"
+	        )
+	      );
+	      table.push(ul);
+	    }
+	    return table;
+	  }
+	};
+
+/***/ },
+/* 162 */
 /***/ function(module, exports) {
 
 	// Builds an object with sunrise/sunset data extracted from API data.
@@ -19865,11 +20058,11 @@
 	};
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1),
-	    HourlyUtils = __webpack_require__(192);
+	    HourlyUtils = __webpack_require__(164);
 	
 	// Extracts data from the JSON objects received from API and builds the HTML to display it.
 	
@@ -19895,10 +20088,105 @@
 	});
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var WeatherActions = __webpack_require__(164);
+	var React = __webpack_require__(1);
+	
+	module.exports = {
+	  buildTable: function (hourly) {
+	    var table = [];
+	    for (var i = 0; i < 18; i++) {
+	      hour = hourly[i];
+	      ul = this.buildList(hour, i);
+	      table.push(ul);
+	    }
+	    return table;
+	  },
+	  buildList: function (hour, i) {
+	    return React.createElement(
+	      'ul',
+	      { key: i, className: 'group hour' },
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        hour.FCTTIME.civil
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        hour.temp.english + "°F"
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        hour.feelslike.english + "°F"
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xxlg left group' },
+	        React.createElement(
+	          'div',
+	          { className: 'left' },
+	          React.createElement('img', { className: 'icon-sm', src: hour.icon_url })
+	        ),
+	        hour.condition
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        hour.humidity + "%"
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        hour.wdir.dir + " " + hour.wspd.english + " mph"
+	      )
+	    );
+	  },
+	  buildHeader: function () {
+	    return React.createElement(
+	      'ul',
+	      { className: 'table-heading group' },
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        'Time'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        'Temp'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        'Feels'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xxlg left' },
+	        'Description'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-xlg left' },
+	        'Humidity'
+	      ),
+	      React.createElement(
+	        'li',
+	        { className: 'col-lg left' },
+	        'Wind'
+	      )
+	    );
+	  }
+	};
+
+/***/ },
+/* 165 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var WeatherActions = __webpack_require__(166);
 	
 	// Fetches weather report from Wunderground API via the rails server (to keep API key hidden).
 	
@@ -19912,11 +20200,11 @@
 	};
 
 /***/ },
-/* 164 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(165),
-	    Constants = __webpack_require__(168);
+	var AppDispatcher = __webpack_require__(167),
+	    Constants = __webpack_require__(170);
 	
 	module.exports = {
 	  updateWeather: function (weather) {
@@ -19928,15 +20216,15 @@
 	};
 
 /***/ },
-/* 165 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(166).Dispatcher;
+	var AppDispatcher = __webpack_require__(168).Dispatcher;
 	
 	module.exports = new AppDispatcher();
 
 /***/ },
-/* 166 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19948,11 +20236,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Dispatcher = __webpack_require__(167);
+	module.exports.Dispatcher = __webpack_require__(169);
 
 
 /***/ },
-/* 167 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20189,7 +20477,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 168 */
+/* 170 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -20200,13 +20488,13 @@
 	};
 
 /***/ },
-/* 169 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Store = __webpack_require__(170).Store,
-	    $ = __webpack_require__(191),
-	    AppDispatcher = __webpack_require__(165),
-	    Constants = __webpack_require__(168),
+	var Store = __webpack_require__(172).Store,
+	    $ = __webpack_require__(186),
+	    AppDispatcher = __webpack_require__(167),
+	    Constants = __webpack_require__(170),
 	    WeatherStore = new Store(AppDispatcher),
 	    _weather = {};
 	
@@ -20228,7 +20516,7 @@
 	module.exports = WeatherStore;
 
 /***/ },
-/* 170 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20240,15 +20528,15 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Container = __webpack_require__(171);
-	module.exports.MapStore = __webpack_require__(173);
-	module.exports.Mixin = __webpack_require__(183);
-	module.exports.ReduceStore = __webpack_require__(174);
-	module.exports.Store = __webpack_require__(175);
+	module.exports.Container = __webpack_require__(173);
+	module.exports.MapStore = __webpack_require__(175);
+	module.exports.Mixin = __webpack_require__(185);
+	module.exports.ReduceStore = __webpack_require__(176);
+	module.exports.Store = __webpack_require__(177);
 
 
 /***/ },
-/* 171 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20270,7 +20558,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxStoreGroup = __webpack_require__(172);
+	var FluxStoreGroup = __webpack_require__(174);
 	
 	var invariant = __webpack_require__(13);
 	var shallowEqual = __webpack_require__(117);
@@ -20431,7 +20719,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 172 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20512,7 +20800,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 173 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20533,8 +20821,8 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxReduceStore = __webpack_require__(174);
-	var Immutable = __webpack_require__(182);
+	var FluxReduceStore = __webpack_require__(176);
+	var Immutable = __webpack_require__(184);
 	
 	var invariant = __webpack_require__(13);
 	
@@ -20662,7 +20950,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 174 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20683,9 +20971,9 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var FluxStore = __webpack_require__(175);
+	var FluxStore = __webpack_require__(177);
 	
-	var abstractMethod = __webpack_require__(181);
+	var abstractMethod = __webpack_require__(183);
 	var invariant = __webpack_require__(13);
 	
 	var FluxReduceStore = (function (_FluxStore) {
@@ -20769,7 +21057,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 175 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20788,7 +21076,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _require = __webpack_require__(176);
+	var _require = __webpack_require__(178);
 	
 	var EventEmitter = _require.EventEmitter;
 	
@@ -20952,7 +21240,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 176 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20965,14 +21253,14 @@
 	 */
 	
 	var fbemitter = {
-	  EventEmitter: __webpack_require__(177)
+	  EventEmitter: __webpack_require__(179)
 	};
 	
 	module.exports = fbemitter;
 
 
 /***/ },
-/* 177 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20991,8 +21279,8 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var EmitterSubscription = __webpack_require__(178);
-	var EventSubscriptionVendor = __webpack_require__(180);
+	var EmitterSubscription = __webpack_require__(180);
+	var EventSubscriptionVendor = __webpack_require__(182);
 	
 	var emptyFunction = __webpack_require__(15);
 	var invariant = __webpack_require__(13);
@@ -21169,7 +21457,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 178 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -21190,7 +21478,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var EventSubscription = __webpack_require__(179);
+	var EventSubscription = __webpack_require__(181);
 	
 	/**
 	 * EmitterSubscription represents a subscription with listener and context data.
@@ -21222,7 +21510,7 @@
 	module.exports = EmitterSubscription;
 
 /***/ },
-/* 179 */
+/* 181 */
 /***/ function(module, exports) {
 
 	/**
@@ -21276,7 +21564,7 @@
 	module.exports = EventSubscription;
 
 /***/ },
-/* 180 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21385,7 +21673,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 181 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21412,7 +21700,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 182 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26399,7 +26687,7 @@
 	}));
 
 /***/ },
-/* 183 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26416,7 +26704,7 @@
 	
 	'use strict';
 	
-	var FluxStoreGroup = __webpack_require__(172);
+	var FluxStoreGroup = __webpack_require__(174);
 	
 	var invariant = __webpack_require__(13);
 	
@@ -26522,324 +26810,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 184 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1),
-	    LocationsStore = __webpack_require__(185),
-	    LocationUtil = __webpack_require__(186),
-	    LocationApi = __webpack_require__(187);
-	
-	// ToggleLocation is responsible for determining whether a location is saved to a
-	// User's list or not, and displaying the appropriate button to add/remove the location.
-	// LocationUtil is also used here to bridge the gap between location data from the API and
-	// location data saved in database (see Autocomplete).
-	
-	module.exports = React.createClass({
-	  displayName: 'exports',
-	
-	  getInitialState: function () {
-	    return { disabled: false };
-	  },
-	  addLocation: function () {
-	    var location = LocationUtil.convertLocation(this.props.location);
-	    this.setState({ disabled: true });
-	    LocationApi.addLocation(location, function () {
-	      this.setState({ disabled: false });
-	    }.bind(this));
-	  },
-	  removeLocation: function () {
-	    var location = LocationUtil.convertLocation(this.props.location);
-	    var idx = LocationsStore.findIndexOf(location);
-	    var id = LocationsStore.all()[idx].id;
-	    this.setState({ disabled: true });
-	    LocationApi.removeLocation(id, function () {
-	      this.setState({ disabled: false });
-	    }.bind(this));
-	  },
-	  isSaved: function () {
-	    var location = LocationUtil.convertLocation(this.props.location);
-	    var idx = LocationsStore.findIndexOf(location);
-	    return idx === -1 ? false : true;
-	  },
-	  render: function () {
-	    var saved = this.isSaved();
-	    var disabled = LocationsStore.all().length === 5 || this.state.disabled;
-	    if (saved) {
-	      return React.createElement(
-	        'button',
-	        { className: 'toggle remove-button', disabled: this.state.disabled, onClick: this.removeLocation },
-	        'Remove Location'
-	      );
-	    } else {
-	      return React.createElement(
-	        'button',
-	        { className: 'toggle add-button', disabled: disabled, onClick: this.addLocation },
-	        'Add Location'
-	      );
-	    }
-	  }
-	});
-
-/***/ },
-/* 185 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Store = __webpack_require__(170).Store,
-	    AppDispatcher = __webpack_require__(165),
-	    Constants = __webpack_require__(168),
-	    LocationsStore = new Store(AppDispatcher),
-	    _locations = [];
-	
-	LocationsStore.all = function () {
-	  return _locations.slice();
-	};
-	
-	LocationsStore.findIndexOf = function (location) {
-	  for (var i = 0; i < _locations.length; i++) {
-	    if (_locations[i].name === location.name) {
-	      return i;
-	    }
-	  }
-	  return -1;
-	};
-	
-	LocationsStore.addLocation = function (location) {
-	  _locations.push(location);
-	};
-	
-	LocationsStore.removeLocation = function (location) {
-	  var idx = LocationsStore.findIndexOf(location);
-	  if (idx >= 0) {
-	    _locations.splice(idx, 1);
-	  }
-	};
-	
-	LocationsStore.__onDispatch = function (payload) {
-	  switch (payload.actionType) {
-	    case Constants.ADD_LOCATION:
-	      LocationsStore.addLocation(payload.location);
-	      LocationsStore.__emitChange();
-	      break;
-	    case Constants.REMOVE_LOCATION:
-	      LocationsStore.removeLocation(payload.location);
-	      LocationsStore.__emitChange();
-	      break;
-	    case Constants.SET_LOCATIONS:
-	      _locations = payload.locations;
-	      LocationsStore.__emitChange();
-	      break;
-	    default:
-	      return;
-	  }
-	};
-	
-	module.exports = LocationsStore;
-
-/***/ },
 /* 186 */
-/***/ function(module, exports) {
-
-	// Builds an object out of API location data that can be read by the LocationsStore
-	
-	module.exports = {
-	  convertLocation: function (location) {
-	    var city = location.city;
-	    var province = location.state ? location.state : location.country;
-	    return { name: city + ", " + province, query: location.l };
-	  }
-	};
-
-/***/ },
-/* 187 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var LocationActions = __webpack_require__(188);
-	
-	// This API is responsible for retrieving a User's locations, adding a location,
-	// removing a location, and sending requests to the autocomplete API.
-	
-	module.exports = {
-	  fetchLocations: function (cb) {
-	    $.get('/api/locations', function (locations) {
-	      LocationActions.setLocations(locations);
-	      if (locations.length > 0) {
-	        cb && cb(locations[0]); // Used to load the first saved location's weather, if there is one.
-	      } else {
-	          cb && cb({ name: "New York, NY", query: "/q/zmw:10001.1.99999" });
-	        }
-	    });
-	  },
-	  addLocation: function (location, cb) {
-	    $.ajax({
-	      type: "POST",
-	      url: "/api/locations",
-	      dataType: "json",
-	      data: { location: location },
-	      success: function (location) {
-	        LocationActions.addLocation(location);
-	        cb && cb();
-	      },
-	      error: function (e) {
-	        alert("An error occurred, please try again soon.");
-	      }
-	    });
-	  },
-	  removeLocation: function (id, cb) {
-	    $.ajax({
-	      type: "DELETE",
-	      url: "/api/locations/" + id,
-	      success: function (location) {
-	        LocationActions.removeLocation(location);
-	        cb && cb();
-	      },
-	      error: function (e) {
-	        alert("An error occurred, please try again soon.");
-	      }
-	    });
-	  },
-	  searchLocation: function (query, cb) {
-	    $.ajax({
-	      type: "GET",
-	      url: "/api/search?api_query=" + query,
-	      dataType: "json",
-	      success: function (results) {
-	        cb(results);
-	      },
-	      error: function (e) {
-	        console.log(e);
-	      }
-	    });
-	  }
-	};
-
-/***/ },
-/* 188 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var AppDispatcher = __webpack_require__(165),
-	    Constants = __webpack_require__(168);
-	
-	module.exports = {
-	  setLocations: function (locations) {
-	    AppDispatcher.dispatch({
-	      actionType: Constants.SET_LOCATIONS,
-	      locations: locations
-	    });
-	  },
-	  addLocation: function (location) {
-	    AppDispatcher.dispatch({
-	      actionType: Constants.ADD_LOCATION,
-	      location: location
-	    });
-	  },
-	  removeLocation: function (location) {
-	    AppDispatcher.dispatch({
-	      actionType: Constants.REMOVE_LOCATION,
-	      location: location
-	    });
-	  }
-	};
-
-/***/ },
-/* 189 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1),
-	    LocationApi = __webpack_require__(187),
-	    LocationUtil = __webpack_require__(186),
-	    WeatherApi = __webpack_require__(163);
-	
-	// Autocomplete uses the Wunderground autocomplete API to list matching results
-	// as the search is being typed. LocationUtil is used to extract information about
-	// the location sent from the API into an object that can be used in determining
-	// whether the User has saved the current location or not.
-	
-	module.exports = React.createClass({
-	  displayName: 'exports',
-	
-	  getInitialState: function () {
-	    return { query: "", results: {} };
-	  },
-	  update: function (e) {
-	    var query = e.target.value;
-	    this.setState({ query: query });
-	    if (query != "") {
-	      LocationApi.searchLocation(query, function (results) {
-	        this.setState({ results: results });
-	      }.bind(this));
-	    }
-	  },
-	  changeLocation: function (result) {
-	    return function () {
-	      var location = { name: result.name, query: result.l };
-	      this.props.changeLocation(location);
-	    }.bind(this);
-	  },
-	  clearList: function () {
-	    this.setState({ results: {} });
-	  },
-	  render: function () {
-	    var list = [];
-	    if (this.state.results.RESULTS) {
-	      var r = this.state.results.RESULTS.slice(0, 5);
-	      list = r.map(function (result, i) {
-	        return React.createElement(
-	          'li',
-	          { key: i, onClick: this.changeLocation(result) },
-	          result.name
-	        );
-	      }.bind(this));
-	    }
-	    return React.createElement(
-	      'div',
-	      { className: 'search', onMouseLeave: this.clearList, onMouseEnter: this.update },
-	      React.createElement('input', { onChange: this.update, value: this.state.query, placeholder: 'Search by city or ZIP' }),
-	      React.createElement(
-	        'ul',
-	        { className: 'results' },
-	        list
-	      )
-	    );
-	  }
-	});
-
-/***/ },
-/* 190 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	
-	// LocationIndex is a side bar displaying User's saved locations.
-	// Each list item has an onClick handler that will update the state of the parent.
-	
-	module.exports = React.createClass({
-	  displayName: 'exports',
-	
-	  changeLocation: function (location) {
-	    return function () {
-	      this.props.changeLocation(location);
-	    }.bind(this);
-	  },
-	  render: function () {
-	    var changeLocation = this.changeLocation;
-	    var names = this.props.locations.map(function (loc, i) {
-	      return React.createElement(
-	        'div',
-	        { key: i, className: 'location', onClick: changeLocation(loc) },
-	        loc.name
-	      );
-	    });
-	    return React.createElement(
-	      'nav',
-	      { className: 'location-nav group' },
-	      names
-	    );
-	  }
-	});
-
-/***/ },
-/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -36676,292 +36647,321 @@
 
 
 /***/ },
+/* 187 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1),
+	    LocationsStore = __webpack_require__(188),
+	    LocationUtil = __webpack_require__(189),
+	    LocationApi = __webpack_require__(190);
+	
+	// ToggleLocation is responsible for determining whether a location is saved to a
+	// User's list or not, and displaying the appropriate button to add/remove the location.
+	// LocationUtil is also used here to bridge the gap between location data from the API and
+	// location data saved in database (see Autocomplete).
+	
+	module.exports = React.createClass({
+	  displayName: 'exports',
+	
+	  getInitialState: function () {
+	    return { disabled: false };
+	  },
+	  addLocation: function () {
+	    var location = LocationUtil.convertLocation(this.props.location);
+	    this.setState({ disabled: true });
+	    LocationApi.addLocation(location, function () {
+	      this.setState({ disabled: false });
+	    }.bind(this));
+	  },
+	  removeLocation: function () {
+	    var location = LocationUtil.convertLocation(this.props.location);
+	    var idx = LocationsStore.findIndexOf(location);
+	    var id = LocationsStore.all()[idx].id;
+	    this.setState({ disabled: true });
+	    LocationApi.removeLocation(id, function () {
+	      this.setState({ disabled: false });
+	    }.bind(this));
+	  },
+	  isSaved: function () {
+	    var location = LocationUtil.convertLocation(this.props.location);
+	    var idx = LocationsStore.findIndexOf(location);
+	    return idx === -1 ? false : true;
+	  },
+	  render: function () {
+	    var saved = this.isSaved();
+	    var disabled = LocationsStore.all().length === 5 || this.state.disabled;
+	    if (saved) {
+	      return React.createElement(
+	        'button',
+	        { className: 'toggle remove-button', disabled: this.state.disabled, onClick: this.removeLocation },
+	        'Remove Location'
+	      );
+	    } else {
+	      return React.createElement(
+	        'button',
+	        { className: 'toggle add-button', disabled: disabled, onClick: this.addLocation },
+	        'Add Location'
+	      );
+	    }
+	  }
+	});
+
+/***/ },
+/* 188 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Store = __webpack_require__(172).Store,
+	    AppDispatcher = __webpack_require__(167),
+	    Constants = __webpack_require__(170),
+	    LocationsStore = new Store(AppDispatcher),
+	    _locations = [];
+	
+	LocationsStore.all = function () {
+	  return _locations.slice();
+	};
+	
+	LocationsStore.findIndexOf = function (location) {
+	  for (var i = 0; i < _locations.length; i++) {
+	    if (_locations[i].name === location.name) {
+	      return i;
+	    }
+	  }
+	  return -1;
+	};
+	
+	LocationsStore.addLocation = function (location) {
+	  _locations.push(location);
+	};
+	
+	LocationsStore.removeLocation = function (location) {
+	  var idx = LocationsStore.findIndexOf(location);
+	  if (idx >= 0) {
+	    _locations.splice(idx, 1);
+	  }
+	};
+	
+	LocationsStore.__onDispatch = function (payload) {
+	  switch (payload.actionType) {
+	    case Constants.ADD_LOCATION:
+	      LocationsStore.addLocation(payload.location);
+	      LocationsStore.__emitChange();
+	      break;
+	    case Constants.REMOVE_LOCATION:
+	      LocationsStore.removeLocation(payload.location);
+	      LocationsStore.__emitChange();
+	      break;
+	    case Constants.SET_LOCATIONS:
+	      _locations = payload.locations;
+	      LocationsStore.__emitChange();
+	      break;
+	    default:
+	      return;
+	  }
+	};
+	
+	module.exports = LocationsStore;
+
+/***/ },
+/* 189 */
+/***/ function(module, exports) {
+
+	// Builds an object out of API location data that can be read by the LocationsStore
+	
+	module.exports = {
+	  convertLocation: function (location) {
+	    var city = location.city;
+	    var province = location.state ? location.state : location.country;
+	    return { name: city + ", " + province, query: location.l };
+	  }
+	};
+
+/***/ },
+/* 190 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var LocationActions = __webpack_require__(191);
+	
+	// This API is responsible for retrieving a User's locations, adding a location,
+	// removing a location, and sending requests to the autocomplete API.
+	
+	module.exports = {
+	  fetchLocations: function (cb) {
+	    $.get('/api/locations', function (locations) {
+	      LocationActions.setLocations(locations);
+	      if (locations.length > 0) {
+	        cb && cb(locations[0]); // Used to load the first saved location's weather, if there is one.
+	      } else {
+	          cb && cb({ name: "New York, NY", query: "/q/zmw:10001.1.99999" });
+	        }
+	    });
+	  },
+	  addLocation: function (location, cb) {
+	    $.ajax({
+	      type: "POST",
+	      url: "/api/locations",
+	      dataType: "json",
+	      data: { location: location },
+	      success: function (location) {
+	        LocationActions.addLocation(location);
+	        cb && cb();
+	      },
+	      error: function (e) {
+	        alert("An error occurred, please try again soon.");
+	      }
+	    });
+	  },
+	  removeLocation: function (id, cb) {
+	    $.ajax({
+	      type: "DELETE",
+	      url: "/api/locations/" + id,
+	      success: function (location) {
+	        LocationActions.removeLocation(location);
+	        cb && cb();
+	      },
+	      error: function (e) {
+	        alert("An error occurred, please try again soon.");
+	      }
+	    });
+	  },
+	  searchLocation: function (query, cb) {
+	    $.ajax({
+	      type: "GET",
+	      url: "/api/search?api_query=" + query,
+	      dataType: "json",
+	      success: function (results) {
+	        cb(results);
+	      },
+	      error: function (e) {
+	        console.log(e);
+	      }
+	    });
+	  }
+	};
+
+/***/ },
+/* 191 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var AppDispatcher = __webpack_require__(167),
+	    Constants = __webpack_require__(170);
+	
+	module.exports = {
+	  setLocations: function (locations) {
+	    AppDispatcher.dispatch({
+	      actionType: Constants.SET_LOCATIONS,
+	      locations: locations
+	    });
+	  },
+	  addLocation: function (location) {
+	    AppDispatcher.dispatch({
+	      actionType: Constants.ADD_LOCATION,
+	      location: location
+	    });
+	  },
+	  removeLocation: function (location) {
+	    AppDispatcher.dispatch({
+	      actionType: Constants.REMOVE_LOCATION,
+	      location: location
+	    });
+	  }
+	};
+
+/***/ },
 /* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(1);
+	var React = __webpack_require__(1),
+	    LocationApi = __webpack_require__(190),
+	    LocationUtil = __webpack_require__(189),
+	    WeatherApi = __webpack_require__(165);
 	
-	module.exports = {
-	  buildTable: function (hourly) {
-	    var table = [];
-	    for (var i = 0; i < 18; i++) {
-	      hour = hourly[i];
-	      ul = this.buildList(hour, i);
-	      table.push(ul);
+	// Autocomplete uses the Wunderground autocomplete API to list matching results
+	// as the search is being typed. LocationUtil is used to extract information about
+	// the location sent from the API into an object that can be used in determining
+	// whether the User has saved the current location or not.
+	
+	module.exports = React.createClass({
+	  displayName: 'exports',
+	
+	  getInitialState: function () {
+	    return { query: "", results: {} };
+	  },
+	  update: function (e) {
+	    var query = e.target.value;
+	    this.setState({ query: query });
+	    if (query != "") {
+	      LocationApi.searchLocation(query, function (results) {
+	        this.setState({ results: results });
+	      }.bind(this));
 	    }
-	    return table;
 	  },
-	  buildList: function (hour, i) {
-	    return React.createElement(
-	      'ul',
-	      { key: i, className: 'group hour' },
-	      React.createElement(
-	        'li',
-	        { className: 'col-xlg left' },
-	        hour.FCTTIME.civil
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-lg left' },
-	        hour.temp.english + "°F"
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-lg left' },
-	        hour.feelslike.english + "°F"
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-xxlg left group' },
-	        React.createElement(
-	          'div',
-	          { className: 'left' },
-	          React.createElement('img', { className: 'icon-sm', src: hour.icon_url })
-	        ),
-	        hour.condition
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-xlg left' },
-	        hour.humidity + "%"
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-lg left' },
-	        hour.wdir.dir + " " + hour.wspd.english + " mph"
-	      )
-	    );
+	  changeLocation: function (result) {
+	    return function () {
+	      var location = { name: result.name, query: result.l };
+	      this.props.changeLocation(location);
+	    }.bind(this);
 	  },
-	  buildHeader: function () {
+	  clearList: function () {
+	    this.setState({ results: {} });
+	  },
+	  render: function () {
+	    var list = [];
+	    if (this.state.results.RESULTS) {
+	      var r = this.state.results.RESULTS.slice(0, 5);
+	      list = r.map(function (result, i) {
+	        return React.createElement(
+	          'li',
+	          { key: i, onClick: this.changeLocation(result) },
+	          result.name
+	        );
+	      }.bind(this));
+	    }
 	    return React.createElement(
-	      'ul',
-	      { className: 'table-heading group' },
+	      'div',
+	      { className: 'search', onMouseLeave: this.clearList, onMouseEnter: this.update },
+	      React.createElement('input', { onChange: this.update, value: this.state.query, placeholder: 'Search by city or ZIP' }),
 	      React.createElement(
-	        'li',
-	        { className: 'col-xlg left' },
-	        'Time'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-lg left' },
-	        'Temp'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-lg left' },
-	        'Feels'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-xxlg left' },
-	        'Description'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-xlg left' },
-	        'Humidity'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'col-lg left' },
-	        'Wind'
+	        'ul',
+	        { className: 'results' },
+	        list
 	      )
 	    );
 	  }
-	};
+	});
 
 /***/ },
 /* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(1),
-	    SunUtil = __webpack_require__(161);
+	var React = __webpack_require__(1);
 	
-	// SunUtil provides a method to extact sun phase data from the API object and make it ready to display.
+	// LocationIndex is a side bar displaying User's saved locations.
+	// Each list item has an onClick handler that will update the state of the parent.
 	
-	module.exports = {
-	  buildCurrentTemp: function (w) {
-	    return React.createElement(
-	      'div',
-	      { className: 'left temp' },
-	      React.createElement(
-	        'h1',
-	        null,
-	        Math.round(w.current_observation.temp_f)
-	      ),
-	      React.createElement(
-	        'h2',
-	        { className: 'degrees' },
-	        '°F'
-	      ),
-	      React.createElement(
-	        'h4',
-	        { className: 'italics' },
-	        'Feels like ',
-	        Math.round(w.current_observation.feelslike_f),
-	        '°'
-	      )
-	    );
+	module.exports = React.createClass({
+	  displayName: 'exports',
+	
+	  changeLocation: function (location) {
+	    return function () {
+	      this.props.changeLocation(location);
+	    }.bind(this);
 	  },
-	  buildConditionsHeading: function () {
-	    return React.createElement(
-	      'ul',
-	      { className: 'left' },
-	      React.createElement(
-	        'li',
-	        null,
-	        'Wind'
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        'Humidity'
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        'Dew Point'
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        'Pressure'
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        'Sunrise'
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        'Sunset'
-	      )
-	    );
-	  },
-	  buildConditionsTable: function (w) {
-	    var sunPhase = SunUtil.parseSunPhase(w.sun_phase);
-	    return React.createElement(
-	      'ul',
-	      { className: 'right text-right' },
-	      React.createElement(
-	        'li',
-	        null,
-	        w.current_observation.wind_dir + " " + Math.round(w.current_observation.wind_mph) + " mph"
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        w.current_observation.relative_humidity
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        w.current_observation.dewpoint_f + "°F"
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        w.current_observation.pressure_in + " in"
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        sunPhase.sunrise
-	      ),
-	      React.createElement(
-	        'li',
-	        null,
-	        sunPhase.sunset
-	      )
-	    );
-	  },
-	  buildForecastHeading: function () {
-	    return React.createElement(
-	      'ul',
-	      { className: 'short-forecast table-heading group' },
-	      React.createElement(
-	        'li',
-	        { className: 'left col-md' },
-	        'Day'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'left col-xlg' },
-	        'Description'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'left col-sm' },
-	        'High'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'left col-sm' },
-	        'Low'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'left col-lg' },
-	        'Wind'
-	      ),
-	      React.createElement(
-	        'li',
-	        { className: 'left col-md' },
-	        'Humidity'
-	      )
-	    );
-	  },
-	  buildForecastTable: function (weather) {
-	    var table = [];
-	    var day, abbreviation, ul;
-	    for (var i = 1; i < 6; i++) {
-	      day = weather.forecast.simpleforecast.forecastday[i];
-	      abbreviation = day.date.weekday.slice(0, 3).toUpperCase();
-	      ul = React.createElement(
-	        'ul',
-	        { key: i, className: 'short-forecast-table group' },
-	        React.createElement(
-	          'li',
-	          { className: 'left col-md' },
-	          abbreviation
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-xlg group' },
-	          React.createElement(
-	            'div',
-	            { className: 'left' },
-	            React.createElement('img', { className: 'icon-sm', src: day.icon_url, width: 25 })
-	          ),
-	          day.conditions
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-sm' },
-	          day.high.fahrenheit + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-sm' },
-	          day.low.fahrenheit + "°F"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-lg' },
-	          day.avewind.dir + " " + day.avewind.mph + " mph"
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'left col-md' },
-	          day.avehumidity + "%"
-	        )
+	  render: function () {
+	    var changeLocation = this.changeLocation;
+	    var names = this.props.locations.map(function (loc, i) {
+	      return React.createElement(
+	        'div',
+	        { key: i, className: 'location', onClick: changeLocation(loc) },
+	        loc.name
 	      );
-	      table.push(ul);
-	    }
-	    return table;
+	    });
+	    return React.createElement(
+	      'nav',
+	      { className: 'location-nav group' },
+	      names
+	    );
 	  }
-	};
+	});
 
 /***/ }
 /******/ ]);

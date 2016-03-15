@@ -32,7 +32,6 @@ Navigate to project directory and run `npm install` and `bundle install`.
 ### Webpack
 Run `webpack` to build the bundle.js file, then you may start the Rails server.
 
-Note: API usage is dependent on a valid key stored in the environment variable "API_KEY"
 
 ## TESTING
 
