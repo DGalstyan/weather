@@ -60,19 +60,20 @@ ul {
 }
 .location-nav {
   height: 48px;
-  border-top: 1px solid black;
-  border-right: 1px solid black;
-  border-bottom: 1px solid black;
+  border: 1px solid black;
   width: 1000px;
   background: white;
 }
 .location {
   box-sizing: border-box;
   float: left;
-  border-left: 1px solid black;
+  border-right: 1px solid black;
   padding: 13px 0;
   text-align: center;
   width: 200px;
+}
+.location:nth-child(5) {
+  border-right: 0;
 }
 .location:hover {
   cursor: pointer;
@@ -100,7 +101,7 @@ h2 {
   float: right;
 }
 .search input {
-  border: 1px solid #444;
+  border: 1px solid #003366;
   border-radius: 10px;
   background: white;
   padding: 5px;
