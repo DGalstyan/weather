@@ -2,7 +2,7 @@
 
 This is a simple weather app that allows you to view the current conditions, 5-day and hourly forecast for any city in the world.  You may also save locations to your list and remove locations from your list.
 
-![Feed View] (https://github.com/alzapiedi/weather/blob/master/screenshots/weather.png)
+![Weather App] (https://github.com/alzapiedi/weather/blob/master/screenshots/weather.png)
 
 ## FEATURES
 
