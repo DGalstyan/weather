@@ -1,6 +1,4 @@
-var React = require('react'),
-    LocationsStore = require('../stores/locations'),
-    LocationApi = require('../apiUtils/LocationApi');
+var React = require('react');
 
 // LocationIndex is a side bar displaying User's saved locations.
 // Each list item has an onClick handler that will update the state of the parent.

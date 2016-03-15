@@ -17,23 +17,33 @@ LocationsStore.findIndexOf = function (location) {
   return -1;
 }
 
+LocationsStore.addLocation = function (location) {
+  _locations.push(location);
+}
+
+LocationsStore.removeLocation = function (location) {
+  var idx = LocationsStore.findIndexOf(location);
+  if (idx >= 0) {
+    _locations.splice(idx, 1);
+  }
+}
+
 LocationsStore.__onDispatch = function (payload) {
   switch (payload.actionType) {
     case Constants.ADD_LOCATION:
-      _locations.push(payload.location);
+      LocationsStore.addLocation(payload.location);
       LocationsStore.__emitChange();
       break;
     case Constants.REMOVE_LOCATION:
-      var idx = LocationsStore.findIndexOf(payload.location);
-      if (idx >= 0) {
-        _locations.splice(idx, 1);
-      }
+      LocationsStore.removeLocation(payload.location);
       LocationsStore.__emitChange();
       break;
     case Constants.SET_LOCATIONS:
       _locations = payload.locations;
       LocationsStore.__emitChange();
       break;
+    default: 
+      return;
   }
 }
 

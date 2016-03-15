@@ -4,7 +4,8 @@ var React = require('react'),
     WeatherApi = require('../apiUtils/WeatherApi'),
     WeatherStore = require('../stores/weather'),
     ToggleLocation = require('./ToggleLocation'),
-    Autocomplete = require('./Autocomplete');
+    Autocomplete = require('./Autocomplete'),
+    LocationUtil = require('../utils/LocationUtil');
 
 // Weather component stores the weather of the current location in state, and
 // listens for changes in the WeatherStore, updating state when change occurs.
@@ -32,14 +33,13 @@ module.exports = React.createClass({
   render: function () {
     var weather = this.state.weather;
     if (weather.response) {
-      var city = weather.location.city;
-      var province = weather.location.state ? weather.location.state : weather.location.country;
+      var locationString = LocationUtil.convertLocation(weather.location).name;
       var lastUpdate = weather.current_observation.observation_time
       return (
         <section className='weather left'>
           <div className='row group'>
             <div className='location-info left'>
-              <h2 className='location-name dark-gray'>{city + ", " + province}</h2>
+              <h2 className='location-name dark-gray'>{locationString}</h2>
               <h4 className='location-time dark-gray'>{lastUpdate}</h4>
             </div>
             <Autocomplete changeLocation={this.props.changeLocation}/>
@@ -50,7 +50,7 @@ module.exports = React.createClass({
         </section>
       );
     } else {
-      return <div></div>
+      return <div className='weather'></div>
     }
   }
 

@@ -5,9 +5,7 @@ module.exports = {
   entry: "./frontend/weather.jsx",
   output: {
     path: path.join(__dirname, 'app', 'assets', 'javascripts'),
-    filename: "bundle.js",
-    devtoolModuleFilenameTemplate: '[resourcePath]',
-    devtoolFallbackModuleFilenameTemplate: '[resourcePath]?[hash]'
+    filename: "bundle.js"
   },
   module: {
     loaders: [
@@ -21,8 +19,9 @@ module.exports = {
       }
     ]
   },
-  devtool: 'source-maps',
+  devtool: 'source-map',
   resolve: {
-    extensions: ["", ".js", ".jsx" ]
+    extensions: ["", ".js", ".jsx" ],
+    root: path.resolve('./node_modules/')
   }
 };

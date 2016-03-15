@@ -1,4 +1,5 @@
 var Store = require('flux/utils').Store,
+    $ = require('jquery'),
     AppDispatcher = require('../dispatcher/dispatcher'),
     Constants = require('../constants/constants'),
     WeatherStore = new Store(AppDispatcher),
@@ -9,9 +10,13 @@ WeatherStore.get = function () {
 }
 
 WeatherStore.__onDispatch = function (payload) {
-  if (payload.actionType === Constants.UPDATE_WEATHER) {
-    _weather = payload.weather;
-    WeatherStore.__emitChange();
+  switch (payload.actionType) {
+    case Constants.UPDATE_WEATHER:
+      _weather = payload.weather;
+      WeatherStore.__emitChange();
+      break;
+    default:
+      return;
   }
 }
 

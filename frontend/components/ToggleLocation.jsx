@@ -23,7 +23,7 @@ module.exports = React.createClass({
     var location = LocationUtil.convertLocation(this.props.location);
     var idx = LocationsStore.findIndexOf(location);
     var id = LocationsStore.all()[idx].id;
-    this.setState({ saved: false, disabled: true });
+    this.setState({ disabled: true });
     LocationApi.removeLocation(id, function () {
       this.setState({ disabled: false });
     }.bind(this));
